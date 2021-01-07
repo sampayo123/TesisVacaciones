@@ -16,5 +16,8 @@ namespace VacacionesTesisApp.Shared.Models
         public int DiasDisponibles { get; set; }
         public Cargo Cargo { get; set; }
         public string CargoId { get; set; }
+        public string EmailUsuario  { get; set; }
+        public string NombreUsuario  { get; set; }
+        
     }
 }
