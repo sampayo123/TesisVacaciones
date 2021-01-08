@@ -1,5 +1,13 @@
-﻿<h3>CrearEmpleado</h3>
+﻿@page "/empleados/crear"
+<h3>Crear Empleado</h3>
 
+<FormularioEmpleados Empleado="Empleado" OnValidSubmit="Crear"></FormularioEmpleados>
 @code {
+  
+    Empleado Empleado=new Empleado();
 
+    void Crear()
+    {
+        Console.WriteLine("Se creo");
+    } 
 }

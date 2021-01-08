@@ -1,5 +1,67 @@
-﻿<h3>IndexEmpleados</h3>
+﻿@page "/empleados"
+<h3>Index Empleados</h3>
+<div class="card-footer">
+    <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo empleado</button>
+    <button type="button" class="btn btn-info" @onclick="(()=>MostrarModalEditar(Id))">Editar empleado</button>
+</div>
+<Modal @ref="AbrirModal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+    <div>
+
+        <div>
+            <label>Nombre</label>
+            <input type="text" @bind-value="@Empleado.Nombre" placeholder="Nombre" />
+        </div>
+    </div>
+
+    @if (editar == false)
+    {
+    <a class="btn btn-success" @onclick="(() => Acciones(Id))">Crear</a>
+
+    }
+    else { 
+    <a class="btn btn-success" @onclick="(() => Acciones(Id))">Editar</a>
+    }
+</Modal>
 
 @code {
+    Modal AbrirModal;
+    public string BontoCrear = "Crear";
+    string Id = "i";
+    bool editar = false;
+    [Parameter] public Empleado Empleado { get; set; } = new Empleado();
+
+    void OcultarModal()
+    {
+        //telefono = new Telefono();
+        AbrirModal.Ocultar();
+    }
+
+    void MostrarModal()
+    {
+        editar = false;
+        Id = null;
+        AbrirModal.Mostrar();
+
+        // NumeroVacio = true;
+    }
+    void MostrarModalEditar(string Id)
+    {
+        editar = true;
+        // NumeroVacio = true;
+        AbrirModal.Mostrar();
+    }
+
+    void Acciones(string id)
+    {
+        if(id == null)
+        {
+            Console.WriteLine("Creado");
+
+        }
+        else
+        {
+            Console.WriteLine("Editar");
+        }
+    }
 
 }
