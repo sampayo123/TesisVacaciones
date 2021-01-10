@@ -12,48 +12,48 @@ namespace VacacionesTesisApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmpleadosController : ControllerBase
+    public class CargosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public EmpleadosController(ApplicationDbContext context)
+        public CargosController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Empleados
+        // GET: api/Cargos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Empleado>>> GetEmpleados()
+        public async Task<ActionResult<IEnumerable<Cargo>>> GetCargos()
         {
-            return await _context.Empleados.Include(x => x.Cargo).ToListAsync();
+            return await _context.Cargos.ToListAsync();
         }
 
-        // GET: api/Empleados/5
+        // GET: api/Cargos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Empleado>> GetEmpleado(string id)
+        public async Task<ActionResult<Cargo>> GetCargo(string id)
         {
-            var empleado = await _context.Empleados.FindAsync(id);
+            var cargo = await _context.Cargos.FindAsync(id);
 
-            if (empleado == null)
+            if (cargo == null)
             {
                 return NotFound();
             }
 
-            return empleado;
+            return cargo;
         }
 
-        // PUT: api/Empleados/5
+        // PUT: api/Cargos/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut]
-        public async Task<IActionResult> PutEmpleado(Empleado empleado)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCargo(string id, Cargo cargo)
         {
-/*            if (id != empleado.Id)
+            if (id != cargo.Id)
             {
                 return BadRequest();
-            }*/
+            }
 
-            _context.Entry(empleado).State = EntityState.Modified;
+            _context.Entry(cargo).State = EntityState.Modified;
 
             try
             {
@@ -61,37 +61,33 @@ namespace VacacionesTesisApp.Server.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-/*                if (!EmpleadoExists(id))
+                if (!CargoExists(id))
                 {
                     return NotFound();
                 }
                 else
                 {
                     throw;
-                }*/
+                }
             }
 
-            return Ok(empleado.Id);
+            return NoContent();
         }
 
-        // POST: api/Empleados
+        // POST: api/Cargos
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Empleado>> PostEmpleado(Empleado empleado)
+        public async Task<ActionResult<Cargo>> PostCargo(Cargo cargo)
         {
-                  var guid = Guid.NewGuid();
-                empleado.Id = guid.ToString();
-            _context.Empleados.Add(empleado);
+            _context.Cargos.Add(cargo);
             try
             {
-          
-
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (EmpleadoExists(empleado.Id))
+                if (CargoExists(cargo.Id))
                 {
                     return Conflict();
                 }
@@ -101,28 +97,28 @@ namespace VacacionesTesisApp.Server.Controllers
                 }
             }
 
-            return Ok(empleado);
+            return CreatedAtAction("GetCargo", new { id = cargo.Id }, cargo);
         }
 
-        // DELETE: api/Empleados/5
+        // DELETE: api/Cargos/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Empleado>> DeleteEmpleado(string id)
+        public async Task<ActionResult<Cargo>> DeleteCargo(string id)
         {
-            var empleado = await _context.Empleados.FindAsync(id);
-            if (empleado == null)
+            var cargo = await _context.Cargos.FindAsync(id);
+            if (cargo == null)
             {
                 return NotFound();
             }
 
-            _context.Empleados.Remove(empleado);
+            _context.Cargos.Remove(cargo);
             await _context.SaveChangesAsync();
 
-            return empleado;
+            return cargo;
         }
 
-        private bool EmpleadoExists(string id)
+        private bool CargoExists(string id)
         {
-            return _context.Empleados.Any(e => e.Id == id);
+            return _context.Cargos.Any(e => e.Id == id);
         }
     }
 }

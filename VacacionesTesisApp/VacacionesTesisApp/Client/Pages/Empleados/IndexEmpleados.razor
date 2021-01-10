@@ -1,67 +1,307 @@
-﻿@page "/empleados"
+﻿@inject IJSRuntime js
+@inject HttpClient http
+@page "/empleados"
 <h3>Index Empleados</h3>
 <div class="card-footer">
     <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo empleado</button>
-    <button type="button" class="btn btn-info" @onclick="(()=>MostrarModalEditar(Id))">Editar empleado</button>
-</div>
-<Modal @ref="AbrirModal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
-    <div>
 
-        <div>
-            <label>Nombre</label>
-            <input type="text" @bind-value="@Empleado.Nombre" placeholder="Nombre" />
-        </div>
+</div>
+<hr>
+<div class="card">
+
+    <div class="card-body" style="overflow-x:auto;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th>
+                    <th scope="col">Cedula</th>
+                    <th scope="col">Fecha de Ingreso</th>
+                    <th scope="col">Dias disponible</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (ListaEmpleado == null)
+                {
+                    <text>Cargando.....</text>
+                }
+                else if (ListaEmpleado.Count == 0)
+                {
+                    <text>Sin registros .....</text>
+                }
+                else
+                {
+                    foreach (var elemento in ListaEmpleado)
+                    {
+                        <tr>
+
+                            <td>@elemento.Nombre</td>
+                            <td>@elemento.Apellido</td>
+                            <td>@elemento.Cedula </td>
+                            <td>@elemento.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.DiasDisponibles</td>
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
+                                <a style="color:#ffff;" class="oi oi-eye btn btn-info" title="Ver" @onclick="(()=>MostrarModalVer(elemento))"></a> |
+                                <a title="Historial"><span class="oi oi-clipboard btn btn-primary" /></a>
+                            </td>
+
+
+                        </tr>
+
+                    }
+                }
+
+            </tbody>
+        </table>
     </div>
 
-    @if (editar == false)
-    {
-    <a class="btn btn-success" @onclick="(() => Acciones(Id))">Crear</a>
+</div>
 
-    }
-    else { 
-    <a class="btn btn-success" @onclick="(() => Acciones(Id))">Editar</a>
-    }
+<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+    <EditForm Model="@Empleado">
+        <DataAnnotationsValidator />
+        @if (Ver == true)
+        {
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Nombre: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Nombre" placeholder="Nombre" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Apellido: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Apellido" placeholder="Apellido" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cedula: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Cedula" placeholder="Cedula" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cargo: </label>
+                        <input class="form-control" type="text" @bind-value="Empleado.Cargo.Descripcion"  disabled />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha nacimiento: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Empleado.FechaNacimiento" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha de ingreso: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Empleado.FechaIngreso" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Dias disponibles: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.DiasDisponibles" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {<div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Nombre: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Nombre" placeholder="Nombre" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Apellido: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Apellido" placeholder="Apellido" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cedula: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.Cedula" placeholder="Cedula" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cargo: </label>
+                        <select class="form-control dropdown" @bind="@Empleado.CargoId" required>
+                            <option>--Seleccione--</option>
+
+                            @foreach (var item in ListaCargos)
+                            {
+                                <option value="@item.Id">@item.Descripcion</option>
+                            }
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha nacimiento: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Empleado.FechaNacimiento" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha de ingreso: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Empleado.FechaIngreso" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Dias disponibles: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Empleado.DiasDisponibles" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            @if (editar == false)
+            {
+                <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
+
+            }
+            else
+            {
+                <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
+            }
+
+        }
+
+    </EditForm>
+
 </Modal>
 
 @code {
-    Modal AbrirModal;
+    Modal Modal;
     public string BontoCrear = "Crear";
-    string Id = "i";
+    string Id;
     bool editar = false;
-    [Parameter] public Empleado Empleado { get; set; } = new Empleado();
+    bool Ver = false;
+    public Empleado Empleado { get; set; } = new Empleado();
+    public List<Empleado> ListaEmpleado { get; set; }=new List<Empleado>();
+    public List<Cargo> ListaCargos { get; set; } = new List<Cargo>();
 
-    void OcultarModal()
+
+    protected override async Task OnInitializedAsync()
     {
-        //telefono = new Telefono();
-        AbrirModal.Ocultar();
+        //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+        ListaCargos = await http.GetFromJsonAsync<List<Cargo>>("api/cargos");
+        ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+@*        List<Cargo> ListaC = new List<Cargo>()
+        {
+            new Cargo{ Id="1",Descripcion="Gerente"},
+            new Cargo{ Id="2",Descripcion="Director"}
+
+        };
+        ListaCargos = ListaC;*@
+
+
+    }
+    async Task OcultarModal()
+    {
+        if (editar==true)
+        {
+
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
+            Empleado = ListaEmpleado.First(x => x.Id.Equals(Empleado.Id));
+        }
+
+
+        Empleado = new Empleado();
+        Modal.Ocultar();
     }
 
     void MostrarModal()
     {
         editar = false;
-        Id = null;
-        AbrirModal.Mostrar();
+        Ver = false;
+        Empleado = new Empleado();
+        Modal.Mostrar();
 
-        // NumeroVacio = true;
+
     }
-    void MostrarModalEditar(string Id)
+    void MostrarModalEditar(Empleado empleado)
     {
         editar = true;
-        // NumeroVacio = true;
-        AbrirModal.Mostrar();
+        Empleado= empleado;
+        Modal.Mostrar();
+    }
+    void MostrarModalVer(Empleado empleado)
+    {
+        Ver = true;
+        Empleado = empleado;
+        Modal.Mostrar();
     }
 
-    void Acciones(string id)
+    async Task Acciones()
     {
-        if(id == null)
-        {
-            Console.WriteLine("Creado");
 
+        if (Empleado.Id == null)
+        {
+            var respuestas = await http.PostAsJsonAsync("api/empleados", Empleado);
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
+            Console.WriteLine("Creado");
+            Empleado = new Empleado();
         }
         else
         {
+            var repuesta = await http.PutAsJsonAsync("api/empleados", Empleado);
             Console.WriteLine("Editar");
         }
+
+        Modal.Ocultar();
     }
 
 }
