@@ -8,5 +8,7 @@ namespace VacacionesTesisApp.Server.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        public bool IsEnabled { get; set; }
+        public string FullNameUser { get; set; }
     }
 }

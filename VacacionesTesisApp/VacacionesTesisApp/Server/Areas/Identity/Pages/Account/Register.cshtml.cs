@@ -46,6 +46,11 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required(ErrorMessage = "El campo Nombre es Obligatorio")]
+            [Display(Name = "Nombre y apellido")]
+            [StringLength(60, ErrorMessage = "Permitido máximo 60 carateres")]
+            public string FullNameImput { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]

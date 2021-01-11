@@ -1,4 +1,7 @@
 ﻿@inject IJSRuntime js
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
 @inject HttpClient http
 @page "/empleados"
 <h3>Index Empleados</h3>
@@ -95,7 +98,7 @@
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Cargo: </label>
-                        <input class="form-control" type="text" @bind-value="Empleado.Cargo.Descripcion"  disabled />
+                        <input class="form-control" type="text" @bind-value="Empleado.Cargo.Descripcion" disabled />
                     </div>
                 </div>
             </div>
@@ -127,6 +130,12 @@
                         <div>
                             <input class="form-control" type="text" @bind-value="Empleado.DiasDisponibles" disabled />
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Usuario: </label>
+                        <input class="form-control" type="text" @bind-value="Empleado.EmailUsuario" disabled />
                     </div>
                 </div>
             </div>
@@ -204,6 +213,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Usuarios: </label>
+                        <select class="form-control dropdown" @bind="@Empleado.EmailUsuario" required>
+                            <option>--Seleccione--</option>
+
+                            @foreach (var item in ListaUser)
+                            {
+                                <option value="@item.Email">@item.Email</option>
+                            }
+
+                        </select>
+                    </div>
+                </div>
             </div>
 
 
@@ -223,35 +246,63 @@
 
 </Modal>
 
+<AuthorizeView>
+    <Authorized>
+        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+        @if (context.User.Identity.Name != null)
+        {
+            EmailUsuario = @context.User.Identity.Name;
+            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+           // NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+         //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+
+        }
+
+    </Authorized>
+</AuthorizeView>
+
+
 @code {
     Modal Modal;
-    public string BontoCrear = "Crear";
-    string Id;
     bool editar = false;
     bool Ver = false;
     public Empleado Empleado { get; set; } = new Empleado();
-    public List<Empleado> ListaEmpleado { get; set; }=new List<Empleado>();
+    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public List<Cargo> ListaCargos { get; set; } = new List<Cargo>();
+    public List<UsuarioModel> ListaUser { get; set; } = new List<UsuarioModel>();
 
+    string EmailUsuario;
+    string IdCreador;
+    string NombreUsuario;
+    string RolUsuario;
 
     protected override async Task OnInitializedAsync()
     {
         //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
-        ListaCargos = await http.GetFromJsonAsync<List<Cargo>>("api/cargos");
-        ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
-@*        List<Cargo> ListaC = new List<Cargo>()
+
+        try
         {
-            new Cargo{ Id="1",Descripcion="Gerente"},
-            new Cargo{ Id="2",Descripcion="Director"}
+            ListaUser = await http.GetFromJsonAsync<List<UsuarioModel>>("api/usuarios");
+            ListaCargos = await http.GetFromJsonAsync<List<Cargo>>("api/cargos");
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
-        };
-        ListaCargos = ListaC;*@
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        @*        List<Cargo> ListaC = new List<Cargo>()
+            {
+                new Cargo{ Id="1",Descripcion="Gerente"},
+                new Cargo{ Id="2",Descripcion="Director"}
 
+            };
+            ListaCargos = ListaC;*@
 
     }
     async Task OcultarModal()
     {
-        if (editar==true)
+        if (editar == true)
         {
 
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
@@ -275,7 +326,8 @@
     void MostrarModalEditar(Empleado empleado)
     {
         editar = true;
-        Empleado= empleado;
+        Ver = false;
+        Empleado = empleado;
         Modal.Mostrar();
     }
     void MostrarModalVer(Empleado empleado)
@@ -290,6 +342,8 @@
 
         if (Empleado.Id == null)
         {
+
+
             var respuestas = await http.PostAsJsonAsync("api/empleados", Empleado);
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
             Console.WriteLine("Creado");

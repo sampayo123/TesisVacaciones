@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VacacionesTesisApp.Server.Data;
 
 namespace VacacionesTesisApp.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210110172959_direccionyEstatusBorrado")]
+    partial class direccionyEstatusBorrado
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,12 +257,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FullNameUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -383,9 +379,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmpleadoId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Estatus")
                         .HasColumnType("nvarchar(max)");
 
@@ -399,8 +392,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EmpleadoId");
 
                     b.ToTable("Solicituds");
                 });
@@ -461,13 +452,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.HasOne("VacacionesTesisApp.Shared.Models.Cargo", "Cargo")
                         .WithMany()
                         .HasForeignKey("CargoId");
-                });
-
-            modelBuilder.Entity("VacacionesTesisApp.Shared.Models.Solicitud", b =>
-                {
-                    b.HasOne("VacacionesTesisApp.Shared.Models.Empleado", "Empleado")
-                        .WithMany()
-                        .HasForeignKey("EmpleadoId");
                 });
 #pragma warning restore 612, 618
         }

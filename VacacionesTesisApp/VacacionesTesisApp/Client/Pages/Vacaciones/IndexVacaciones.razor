@@ -1,6 +1,311 @@
 ﻿@page "/vacaciones"
-<h3>IndexVacaciones</h3>
+@inject IJSRuntime js
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+@inject HttpClient http
+<h3>Index Vacaciones</h3>
+<div class="card-footer">
+    <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo solicitud</button>
+
+</div>
+<div>
+    <input type="text" value="@Empleado.DiasDisponibles" disabled />
+</div>
+
+<hr>
+<div class="card">
+
+    <div class="card-body" style="overflow-x:auto;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Fecha inicio</th>
+                    <th scope="col">Fecha Fin</th>
+                    <th scope="col">Dias a tomar</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (ListaSolicitudesVacaciones == null)
+                {
+                    <text>Cargando.....</text>
+                }
+                else if (ListaSolicitudesVacaciones.Count == 0)
+                {
+                    <text>Sin registros .....</text>
+                }
+                else
+                {
+                    foreach (var elemento in ListaSolicitudesVacaciones)
+                    {
+                        <tr>
+
+
+                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy") </td>
+                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.Descripcion </td>
+                            <td>@elemento.Estatus</td>
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
+                                <a style="color:#ffff;" class="oi oi-eye btn btn-info" title="Ver" @onclick="(()=>MostrarModalVer(elemento))"></a> |
+                                <a title="Historial"><span class="oi oi-clipboard btn btn-primary" /></a>
+                            </td>
+
+
+                        </tr>
+
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+    <EditForm Model="@SolicitudVacaciones">
+        <DataAnnotationsValidator />
+        @if (Ver == true)
+        {
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha inicio: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha fin: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaFin" placeholder="Fecha Fin" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Descripcion: </label>
+                        <div>
+                            <InputTextArea class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion" placeholder="Descripción" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cantidad de dias: </label>
+                        <input class="form-control" type="text" @bind-value="SolicitudVacaciones.CantidadDias" disabled />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Dias disponibles: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Estatus" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        { <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha inicio: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha fin: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaFin" placeholder="Fecha Fin" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        <label>Descripción: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion"
+                                   placeholder="Descripción" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cantidad de dias: </label>
+                        @if (SolicitudVacaciones.FechaInicio != SolicitudVacaciones.FechaFin)
+                        {
+                            SolicitudVacaciones.CantidadDias = 1;
+                            cantidaddias = (SolicitudVacaciones.FechaFin - SolicitudVacaciones.FechaInicio).TotalDays;
+                            cantidaddias = cantidaddias + 1;
+                            SolicitudVacaciones.CantidadDias = SolicitudVacaciones.CantidadDias + Convert.ToInt32(cantidaddias);
+                        }
+                        else
+                        {
+                            SolicitudVacaciones.CantidadDias = 1;
+                        }
+                        <input class="form-control" type="text" @bind-value="SolicitudVacaciones.CantidadDias" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Estatus: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Estatus" disabled />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (editar == false)
+            {
+                <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
+
+            }
+            else
+            {
+                <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
+            }
+
+        }
+
+    </EditForm>
+</Modal>
+
+<AuthorizeView>
+    <Authorized>
+        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+        @if (context.User.Identity.Name != null)
+        {
+            EmailUsuario = @context.User.Identity.Name;
+            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+            // NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+
+        }
+
+    </Authorized>
+</AuthorizeView>
 
 @code {
+
+    Modal Modal;
+    bool editar = false;
+    bool Ver = false;
+    public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudesVacaciones { get; set; } = new List<Solicitud>();
+    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+    public Empleado Empleado { get; set; } = new Empleado();
+
+    string EmailUsuario;
+    string IdCreador;
+    string NombreUsuario;
+    string RolUsuario;
+    Double cantidaddias;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+        try
+        {
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>("api/solicitud");
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+            Empleado = ListaEmpleado.First(x => x.EmailUsuario==EmailUsuario);
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
+    }
+
+    async Task OcultarModal()
+    {
+        if (editar == true)
+        {
+
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud");
+            SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
+        }
+
+
+        SolicitudVacaciones = new Solicitud();
+        Modal.Ocultar();
+    }
+
+    void MostrarModal()
+    {
+        editar = false;
+        Ver = false;
+        SolicitudVacaciones = new Solicitud();
+        if (SolicitudVacaciones.Id == null)
+        {
+            SolicitudVacaciones.Estatus = "Generada";
+            SolicitudVacaciones.FechaInicio = DateTime.Now;
+            SolicitudVacaciones.FechaFin = DateTime.Now;
+            Console.WriteLine(cantidaddias);
+        }
+        Modal.Mostrar();
+
+
+    }
+    void MostrarModalEditar(Solicitud solicitud)
+    {
+        editar = true;
+        SolicitudVacaciones = solicitud;
+        Modal.Mostrar();
+    }
+    void MostrarModalVer(Solicitud solicitud)
+    {
+        Ver = true;
+        SolicitudVacaciones = solicitud;
+        Modal.Mostrar();
+    }
+
+    async Task Acciones()
+    {
+
+        if (SolicitudVacaciones.Id == null)
+        {
+            SolicitudVacaciones.Estatus = "Generada";
+            var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud");
+            Console.WriteLine("Creado");
+            SolicitudVacaciones = new Solicitud();
+        }
+        else
+        {
+            var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
+            Console.WriteLine("Editar");
+        }
+
+        Modal.Ocultar();
+    }
+
 
 }

@@ -12,6 +12,8 @@ namespace VacacionesTesisApp.Shared.Models
         public int CantidadDias { get; set; }
         public string Descripcion { get; set; }
         public string Tipo { get; set; }
-        public Estatus Estatus { get; set; }
+        public string Estatus { get; set; }
+        public Empleado Empleado { get; set; }
+        public string EmpleadoId { get; set; }
     }
 }
