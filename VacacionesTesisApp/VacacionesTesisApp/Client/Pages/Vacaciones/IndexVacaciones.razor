@@ -234,7 +234,11 @@
             ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>("api/solicitud");
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
+            if (Empleado.Id != null)
+            {
+
             Empleado = ListaEmpleado.First(x => x.EmailUsuario==EmailUsuario);
+            }
 
         }
         catch (AccessTokenNotAvailableException exception)

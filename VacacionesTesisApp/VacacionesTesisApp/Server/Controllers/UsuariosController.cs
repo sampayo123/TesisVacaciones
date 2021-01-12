@@ -83,7 +83,6 @@ namespace VacacionesTesisApp.Server.Controllers
 
 
 
-
         [HttpGet("roles")]
         public async Task<ActionResult<List<RolModel>>> GetRoles()
         {

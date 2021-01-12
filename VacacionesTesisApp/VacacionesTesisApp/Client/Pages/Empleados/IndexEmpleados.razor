@@ -216,12 +216,12 @@
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Usuarios: </label>
-                        <select class="form-control dropdown" @bind="@Empleado.EmailUsuario" required>
+                        <select class="form-control dropdown" @bind="@Empleado.NombreUsuario" required>
                             <option>--Seleccione--</option>
 
                             @foreach (var item in ListaUser)
                             {
-                                <option value="@item.Email">@item.Email</option>
+                                <option value="@item.Nombre">@item.Nombre</option>
                             }
 
                         </select>
@@ -252,9 +252,12 @@
         @if (context.User.Identity.Name != null)
         {
             EmailUsuario = @context.User.Identity.Name;
+            Console.WriteLine(EmailUsuario);
             IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
-           // NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
-         //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+            Console.WriteLine(IdCreador);
+           // NombreUsuario = @context.User.Claims.First(c => c.ValueType == "FullNameUser").Value;
+            Console.WriteLine(NombreUsuario);
+            // RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
         }
 
@@ -273,7 +276,7 @@
 
     string EmailUsuario;
     string IdCreador;
-    string NombreUsuario;
+    string NombreUsuario="";
     string RolUsuario;
 
     protected override async Task OnInitializedAsync()

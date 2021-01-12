@@ -4,21 +4,53 @@
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
 
+
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Hello, @context.User.Identity.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Cerrar session</button>
+        <a href="authentication/profile">
+            Hola,
+    @*        @if (context.User.Claims.First(c => c.Type == "FullNameUser").Value == null ||
+           context.User.Claims.First(c => c.Type == "FullNameUser").Value == "")
+            {
+                @context.User.Identity.Name
+            }
+            else
+            {*@
+                @context.User.Identity.Name
+          @*  }*@
+        </a>
+        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Cerrar sesión</button>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/register">Registrar</a>
-        <a href="authentication/login">Ingresar</a>
+        <a href="authentication/login">Acceder</a>
+@*        <a href="authentication/register">Registrar</a>*@
     </NotAuthorized>
 </AuthorizeView>
+
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <a href="authentication/register">Registrar</a>
+    </Authorized>
+</AuthorizeView>
+
 
 @code{
     private async Task BeginSignOut(MouseEventArgs args)
     {
         await SignOutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");
+
     }
+
+
+    //private async Task ActualizarNombre()
+    //{
+    //    var identity = (System.Security.Claims.ClaimsIdentity)Context.User.Identity;
+    //    var claim1 = identity.Claims.FirstOrDefault(c => c.Type == "FullName");
+
+    //    var principal = System.Security.Claims.ClaimsPrincipal.Current;
+    //    string fullname2 = principal.FindFirst("FullNameUser").Value;
+    //}
+
+
 }

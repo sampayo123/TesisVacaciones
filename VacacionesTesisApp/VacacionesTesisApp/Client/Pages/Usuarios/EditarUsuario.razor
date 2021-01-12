@@ -1,0 +1,97 @@
+﻿@page "/usuarios/editar/{UserId}"
+@inject HttpClient http
+@inject IJSRuntime js
+@using VacacionesTesisApp.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@*@attribute [Authorize(Roles = "Admin")]*@
+@attribute [Authorize]
+
+<h3>Editar rol de Usuario</h3>
+
+<h6>Editando el Usuario: @usuario.Nombre , (@usuario.Email), @usuario.Rol</h6>
+
+<div class="form-inline">
+
+    <select class="form-control mb-2 mr-sm-2" @bind="rolSeleccionado">
+        <option value="0">--Seleccione un rol--</option>
+        @foreach (var rol in roles)
+        {
+            <option value="@rol.Nombre">@rol.Nombre</option>
+}
+    </select>
+
+    <button class="btn btn-info mb-2 mr-sm-2" @onclick="AsignarRol">Asignar Rol</button>
+    <button class="btn btn-danger mb-2 mr-sm-2" @onclick="RemoverRol">Remover Rol</button>
+</div>
+
+@code { public UsuarioModel usuario = new UsuarioModel();
+
+    [Parameter] public string UserId { get; set; }
+    private List<RolModel> roles = new List<RolModel>();
+    private string rolSeleccionado = "0";
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await http.GetFromJsonAsync<List<RolModel>>("api/usuarios/roles");
+
+
+        usuario = await http.GetFromJsonAsync<UsuarioModel>($"api/usuarios/{UserId}");
+
+        //if (httpResponse.Error)
+        //{
+        //    await mostrarMensajes.MostrarMensajeError(await httpResponse.GetBody());
+        //}
+        //else
+        //{
+        //    roles = httpResponse.Response;
+        //}
+
+        roles = httpResponse;
+
+    }
+
+    private async Task AsignarRol()
+    {
+        await EditarRol("api/usuarios/asignarRol");
+    }
+
+    private async Task RemoverRol()
+    {
+        await EditarRol("api/usuarios/removerRol");
+
+    }
+
+    private async Task EditarRol(string url)
+    {
+        if (rolSeleccionado == "0")
+        {
+            @*await js.MostrarMensaje("Advertencia"
+                    , "Debe Seleccionar un Rol", TipoMensajeSweetAler.warning);*@
+            return;
+        }
+
+        var rolDTO = new EditarRolModel() { RoleId = rolSeleccionado, UserId = UserId };
+
+        var httpResponse = await http.PostAsJsonAsync<EditarRolModel>(url, rolDTO);
+
+        if (httpResponse.Equals("Conflict"))
+        {
+    Console.WriteLine("error");
+           @* await js.MostrarMensaje("Error"
+                    , "Se presentó un error, notificar a sistemas", TipoMensajeSweetAler.error);*@
+
+        }
+        else
+        {
+            Console.WriteLine("exito");
+           @* await js.MostrarMensaje("Operación realizada", "Se asigno el Rol", TipoMensajeSweetAler.success);*@
+        await OnInitializedAsync();
+    }
+
+}
+
+}
