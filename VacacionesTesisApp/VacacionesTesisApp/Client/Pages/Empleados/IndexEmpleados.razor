@@ -255,9 +255,9 @@
             Console.WriteLine(EmailUsuario);
             IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
             Console.WriteLine(IdCreador);
-           // NombreUsuario = @context.User.Claims.First(c => c.ValueType == "FullNameUser").Value;
+            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
             Console.WriteLine(NombreUsuario);
-            // RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+            RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
         }
 

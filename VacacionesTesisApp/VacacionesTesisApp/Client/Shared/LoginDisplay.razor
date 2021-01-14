@@ -9,25 +9,25 @@
     <Authorized>
         <a href="authentication/profile">
             Hola,
-    @*        @if (context.User.Claims.First(c => c.Type == "FullNameUser").Value == null ||
-           context.User.Claims.First(c => c.Type == "FullNameUser").Value == "")
+            @if (context.User.Claims.First(c => c.Type == "FullNameUser").Value == null ||
+          context.User.Claims.First(c => c.Type == "FullNameUser").Value == "")
             {
                 @context.User.Identity.Name
             }
             else
-            {*@
-                @context.User.Identity.Name
-          @*  }*@
+            {
+                @context.User.Claims.First(c => c.Type == "FullNameUser").Value
+            }
         </a>
         <button class="nav-link btn btn-link" @onclick="BeginSignOut">Cerrar sesión</button>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/login">Acceder</a>
+        <a href="authentication/login">Iniciar sesión</a>
 @*        <a href="authentication/register">Registrar</a>*@
     </NotAuthorized>
 </AuthorizeView>
 
-<AuthorizeView Roles="admin">
+<AuthorizeView Roles="Admin">
     <Authorized>
         <a href="authentication/register">Registrar</a>
     </Authorized>
