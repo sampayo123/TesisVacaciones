@@ -135,7 +135,7 @@
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Usuario: </label>
-                        <input class="form-control" type="text" @bind-value="Empleado.EmailUsuario" disabled />
+                        <input class="form-control" type="text" @bind-value="Empleado.NombreUsuario" disabled />
                     </div>
                 </div>
             </div>
@@ -257,7 +257,7 @@
             Console.WriteLine(IdCreador);
             NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
             Console.WriteLine(NombreUsuario);
-            RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+           // RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
         }
 

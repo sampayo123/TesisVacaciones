@@ -32,14 +32,14 @@ namespace VacacionesTesisApp.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Solicitud>> GetSolicitud(string id)
         {
-            var solicitud = await _context.Solicituds.FindAsync(id);
+            var solicitud = await _context.Solicituds.Include(x => x.Empleado).Where(x => x.EmpleadoId ==id).ToListAsync();
 
             if (solicitud == null)
             {
                 return NotFound();
             }
 
-            return solicitud;
+            return Ok(solicitud);
         }
 
         // PUT: api/Solicitud/5

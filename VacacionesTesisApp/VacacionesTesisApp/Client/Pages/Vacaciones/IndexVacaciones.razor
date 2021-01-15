@@ -21,9 +21,10 @@
             <thead>
                 <tr>
                     <th scope="col">Nombre</th>
-                    <th scope="col">Descripción</th>
                     <th scope="col">Fecha inicio</th>
                     <th scope="col">Fecha Fin</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Estatus</th>
                     <th scope="col">Dias a tomar</th>
                     <th scope="col">Acción</th>
                 </tr>
@@ -45,10 +46,12 @@
                         <tr>
 
 
-                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy") </td>
+                            <td>@NombreMostrar</td>
+                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
                             <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
                             <td>@elemento.Descripcion </td>
                             <td>@elemento.Estatus</td>
+                            <td>@elemento.CantidadDias</td>
                             <td>
                                 <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
                                 <a style="color:#ffff;" class="oi oi-eye btn btn-info" title="Ver" @onclick="(()=>MostrarModalVer(elemento))"></a> |
@@ -95,7 +98,7 @@
                     <div class="form-group">
                         <label>Descripcion: </label>
                         <div>
-                            <InputTextArea class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion" placeholder="Descripción" disabled />
+                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion" placeholder="Descripción" disabled />
                         </div>
                     </div>
                 </div>
@@ -125,7 +128,7 @@
                     <div class="form-group">
                         <label>Fecha inicio: </label>
                         <div>
-                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" />
+                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" disabled />
                         </div>
                     </div>
                 </div>
@@ -201,7 +204,7 @@
         {
             EmailUsuario = @context.User.Identity.Name;
             IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
-            // NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
             //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
         }
@@ -211,105 +214,130 @@
 
 @code {
 
-    Modal Modal;
-    bool editar = false;
-    bool Ver = false;
-    public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudesVacaciones { get; set; } = new List<Solicitud>();
-    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
-    public Empleado Empleado { get; set; } = new Empleado();
+        Modal Modal;
+        bool editar = false;
+        bool Ver = false;
+        public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
+        public List<Solicitud> ListaSolicitudesVacaciones { get; set; } = new List<Solicitud>();
+        public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+        public Empleado Empleado { get; set; } = new Empleado();
 
-    string EmailUsuario;
-    string IdCreador;
-    string NombreUsuario;
-    string RolUsuario;
-    Double cantidaddias;
+        string EmailUsuario;
+        string IdCreador;
+        string NombreUsuario;
+        string RolUsuario;
+        string NombreMostrar;
 
-    protected override async Task OnInitializedAsync()
-    {
-        //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+        Double cantidaddias;
 
-        try
+        protected override async Task OnInitializedAsync()
         {
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>("api/solicitud");
-            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+            //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
-            if (Empleado.Id != null)
+            try
             {
+                ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
-            Empleado = ListaEmpleado.First(x => x.EmailUsuario==EmailUsuario);
+                Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
+                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                if (Empleado.Id != null)
+                {
+                    NombreMostrar = Empleado.Nombre;
+                }
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
             }
 
         }
-        catch (AccessTokenNotAvailableException exception)
+
+        async Task OcultarModal()
         {
-            exception.Redirect();
-        }
+            if (editar == true)
+            {
 
-    }
-
-    async Task OcultarModal()
-    {
-        if (editar == true)
-        {
-
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud");
-            SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
-        }
+                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
+            }
 
 
-        SolicitudVacaciones = new Solicitud();
-        Modal.Ocultar();
-    }
-
-    void MostrarModal()
-    {
-        editar = false;
-        Ver = false;
-        SolicitudVacaciones = new Solicitud();
-        if (SolicitudVacaciones.Id == null)
-        {
-            SolicitudVacaciones.Estatus = "Generada";
-            SolicitudVacaciones.FechaInicio = DateTime.Now;
-            SolicitudVacaciones.FechaFin = DateTime.Now;
-            Console.WriteLine(cantidaddias);
-        }
-        Modal.Mostrar();
-
-
-    }
-    void MostrarModalEditar(Solicitud solicitud)
-    {
-        editar = true;
-        SolicitudVacaciones = solicitud;
-        Modal.Mostrar();
-    }
-    void MostrarModalVer(Solicitud solicitud)
-    {
-        Ver = true;
-        SolicitudVacaciones = solicitud;
-        Modal.Mostrar();
-    }
-
-    async Task Acciones()
-    {
-
-        if (SolicitudVacaciones.Id == null)
-        {
-            SolicitudVacaciones.Estatus = "Generada";
-            var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud");
-            Console.WriteLine("Creado");
             SolicitudVacaciones = new Solicitud();
+            Modal.Ocultar();
+        }
+
+        void MostrarModal()
+        {
+            editar = false;
+            Ver = false;
+            SolicitudVacaciones = new Solicitud();
+            if (SolicitudVacaciones.Id == null)
+            {
+
+                SolicitudVacaciones.Estatus = "Generada";
+                SolicitudVacaciones.FechaInicio = DateTime.Now;
+                SolicitudVacaciones.FechaFin = DateTime.Now;
+                Console.WriteLine(cantidaddias);
+            }
+            Modal.Mostrar();
+
+
+        }
+        void MostrarModalEditar(Solicitud solicitud)
+        {
+            editar = true;
+            Ver = false;
+            SolicitudVacaciones = solicitud;
+            Modal.Mostrar();
+        }
+        void MostrarModalVer(Solicitud solicitud)
+        {
+            Ver = true;
+            editar = false;
+            SolicitudVacaciones = solicitud;
+            Modal.Mostrar();
+        }
+
+        async Task Acciones()
+        {
+
+            if (SolicitudVacaciones.Id == null)
+            {
+                SolicitudVacaciones.EmpleadoId = Empleado.Id;
+                SolicitudVacaciones.Estatus = "Generada";
+                var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
+                string configuracion = respuestas.StatusCode.ToString();
+
+                if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
+                {
+                    Console.WriteLine("No puede ser mayor");
+                }
+                else { 
+                if (configuracion.Equals("OK"))
+                {
+                    Console.WriteLine("Exito");
+                    Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
+                    http.PutAsJsonAsync("api/empleados", Empleado);
+                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                    Console.WriteLine("Creado");
+                }
+                else
+                {
+                }
+
+            }
+            SolicitudVacaciones = new Solicitud();
+
         }
         else
         {
             var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
-            Console.WriteLine("Editar");
+        Console.WriteLine("Editar");
         }
 
-        Modal.Ocultar();
+    Modal.Ocultar();
     }
 
 
-}
+    }
