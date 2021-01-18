@@ -5,13 +5,23 @@
 @attribute [Authorize]
 @inject HttpClient http
 <h3>Index Vacaciones</h3>
-<div class="card-footer">
-    <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo solicitud</button>
-
-</div>
 <div>
-    <input type="text" value="@Empleado.DiasDisponibles" disabled />
-</div>
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+            <label></label>
+            <div>
+            <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo solicitud</button>
+            </div>
+        </div>
+            <div  class="col-lg-3 col-md-3 col-sm-3 col-12">
+        <label>Días disponibles:</label>
+                <div>
+                    <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>     
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 <hr>
 <div class="card">
@@ -53,9 +63,7 @@
                             <td>@elemento.Estatus</td>
                             <td>@elemento.CantidadDias</td>
                             <td>
-                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
-                                <a style="color:#ffff;" class="oi oi-eye btn btn-info" title="Ver" @onclick="(()=>MostrarModalVer(elemento))"></a> |
-                                <a title="Historial"><span class="oi oi-clipboard btn btn-primary" /></a>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
                             </td>
 
 
@@ -73,57 +81,7 @@
 <Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
     <EditForm Model="@SolicitudVacaciones">
         <DataAnnotationsValidator />
-        @if (Ver == true)
-        {
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha inicio: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" disabled />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha fin: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaFin" placeholder="Fecha Fin" disabled />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Descripcion: </label>
-                        <div>
-                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion" placeholder="Descripción" disabled />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Cantidad de dias: </label>
-                        <input class="form-control" type="text" @bind-value="SolicitudVacaciones.CantidadDias" disabled />
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Dias disponibles: </label>
-                        <div>
-                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Estatus" disabled />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-        else
-        { <div class="row">
+<div class="row">
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Fecha inicio: </label>
@@ -191,9 +149,6 @@
             {
                 <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
             }
-
-        }
-
     </EditForm>
 </Modal>
 
@@ -288,13 +243,6 @@
         {
             editar = true;
             Ver = false;
-            SolicitudVacaciones = solicitud;
-            Modal.Mostrar();
-        }
-        void MostrarModalVer(Solicitud solicitud)
-        {
-            Ver = true;
-            editar = false;
             SolicitudVacaciones = solicitud;
             Modal.Mostrar();
         }

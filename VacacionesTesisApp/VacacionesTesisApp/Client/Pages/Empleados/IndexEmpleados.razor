@@ -273,6 +273,7 @@
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public List<Cargo> ListaCargos { get; set; } = new List<Cargo>();
     public List<UsuarioModel> ListaUser { get; set; } = new List<UsuarioModel>();
+    public List<RolModel> ListaRoles { get; set; } = new List<RolModel>();
 
     string EmailUsuario;
     string IdCreador;
@@ -285,6 +286,7 @@
 
         try
         {
+            ListaRoles = await http.GetFromJsonAsync<List<RolModel>>("api/usuarios/roles");
             ListaUser = await http.GetFromJsonAsync<List<UsuarioModel>>("api/usuarios");
             ListaCargos = await http.GetFromJsonAsync<List<Cargo>>("api/cargos");
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");

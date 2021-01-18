@@ -1,21 +1,4 @@
-﻿/*using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using VacacionesTesisApp.Server.Models;*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,8 +14,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-
-
+using System.Net;
+using System.Net.Http;
+using VacacionesTesisApp.Shared.Models;
 
 namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 {
@@ -43,6 +27,9 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+
+        //public static Dictionary<string, HttpClient> HttpClients { get; set; }
+      //  public HttpClient client = new HttpClient();
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -93,15 +80,36 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
+/*
+        static async Task<UsuarioModel> GetProductAsync(string id)
+        {
+            UsuarioModel user = null;
+            HttpResponseMessage response = await client.GetAsync(id);
+            if (response.IsSuccessStatusCode)
+            {
+                user = await response.Content.rea<UsuarioModel>();
+            }
+            return user;
+        }*/
+
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+
+          
+          
+          /*  product = await GetProductAsync(url.PathAndQuery);
+            ShowProduct(product);*/
+            //returnUrl = returnUrl ?? Url.Content("/usuarios");
+
+            returnUrl = ("/usuarios"); 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FullNameUser = Input.FullNameImput };
+               // var user = new ApplicationUser { UserName = "Admin", Email = "is@mail.com", FullNameUser = "Administrador" };
                 var result = await _userManager.CreateAsync(user, Input.Password);
+               // var result = await _userManager.CreateAsync(user, "Control6*");
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
