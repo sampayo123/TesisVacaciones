@@ -14,6 +14,7 @@ using System.Linq;
 using VacacionesTesisApp.Server.Data;
 using VacacionesTesisApp.Server.Models;
 using VacacionesTesisApp.Server.Helpers;
+using Blazored.Toast;
 
 namespace VacacionesTesisApp.Server
 {
@@ -47,6 +48,7 @@ namespace VacacionesTesisApp.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddBlazoredToast();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

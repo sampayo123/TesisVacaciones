@@ -1,16 +1,25 @@
 ﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration
 
-<div class="sidebar">
+<div class="sidebar "style="overflow-y:auto">
     <NavMenu />
 </div>
 
 <div class="main">
     <div class="top-row px-4 auth">
         <LoginDisplay />
-       
+
     </div>
 
     <div class="content px-4">
         @Body
     </div>
 </div>
+<BlazoredToasts Position = "ToastPosition.BottomCenter"
+    Timeout="3"
+    IconType="IconType.FontAwesome"
+    SuccessClass="success-toast-override"
+    SuccessIcon="fa fa-check"
+    ErrorIcon="fa fa-time"
+    InfoIcon="fa fa-info"
+    WarningIcon="fa fa-warning" />

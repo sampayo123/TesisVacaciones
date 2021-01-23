@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [Authorize]
 @inject HttpClient http
+@inject IToastService toast
 @page "/empleados"
 <h3>Index Empleados</h3>
 <div class="card-footer">
@@ -357,6 +358,7 @@
         else
         {
             var repuesta = await http.PutAsJsonAsync("api/empleados", Empleado);
+            
             Console.WriteLine("Editar");
         }
 

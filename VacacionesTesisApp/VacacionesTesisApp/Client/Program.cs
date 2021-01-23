@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
+using Blazored.Toast;
 
 namespace VacacionesTesisApp.Client
 {
@@ -32,12 +33,14 @@ namespace VacacionesTesisApp.Client
             // Supply HttpClient instances that include access tokens when making requests to the server project
             builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("VacacionesTesisApp.ServerAPI"));
 
+            builder.Services.AddBlazoredToast();
             var host = builder.Build();
 
+           
             host.Services
             .UseBootstrapProviders()
               .UseFontAwesomeIcons();
-
+            
             builder.Services.AddApiAuthorization();
 
             await builder.Build().RunAsync();
