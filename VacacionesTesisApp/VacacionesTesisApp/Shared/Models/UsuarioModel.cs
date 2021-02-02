@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace VacacionesTesisApp.Shared.Models
@@ -10,7 +11,7 @@ namespace VacacionesTesisApp.Shared.Models
         public string Nombre { get; set; }
         public string Email { get; set; }
 
-       /* [NotMapped]
-        public string Rol { get; set; }*/
+       [NotMapped]
+        public string Rol { get; set; }
     }
 }

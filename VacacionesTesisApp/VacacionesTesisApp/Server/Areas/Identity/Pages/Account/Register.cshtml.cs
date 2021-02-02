@@ -7,13 +7,16 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using VacacionesTesisApp.Server.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using VacacionesTesisApp.Server.Models;
+using System.Net;
+using System.Net.Http;
+using VacacionesTesisApp.Shared.Models;
 
 namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 {
@@ -24,6 +27,9 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+
+        //public static Dictionary<string, HttpClient> HttpClients { get; set; }
+      //  public HttpClient client = new HttpClient();
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -46,19 +52,25 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+
+            [Required(ErrorMessage = "El campo Nombre es Obligatorio")]
+            [Display(Name = "Nombre y apellido")]
+            [StringLength(60, ErrorMessage = "Permitido máximo 60 carateres")]
+            public string FullNameImput { get; set; }
+
             [Required]
             [EmailAddress]
-            [Display(Name = "Email")]
+            [Display(Name = "Correo")]
             public string Email { get; set; }
 
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Clave")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
+            [Display(Name = "Confirmar Clave")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
         }
@@ -68,15 +80,36 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
+/*
+        static async Task<UsuarioModel> GetProductAsync(string id)
+        {
+            UsuarioModel user = null;
+            HttpResponseMessage response = await client.GetAsync(id);
+            if (response.IsSuccessStatusCode)
+            {
+                user = await response.Content.rea<UsuarioModel>();
+            }
+            return user;
+        }*/
+
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+
+          
+          
+          /*  product = await GetProductAsync(url.PathAndQuery);
+            ShowProduct(product);*/
+            //returnUrl = returnUrl ?? Url.Content("/usuarios");
+
+            returnUrl = ("/usuarios"); 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FullNameUser = Input.FullNameImput };
+               // var user = new ApplicationUser { UserName = "Admin", Email = "is@mail.com", FullNameUser = "Administrador" };
                 var result = await _userManager.CreateAsync(user, Input.Password);
+               // var result = await _userManager.CreateAsync(user, "Control6*");
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -105,7 +138,7 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
-                }
+                 }
             }
 
             // If we got this far, something failed, redisplay form

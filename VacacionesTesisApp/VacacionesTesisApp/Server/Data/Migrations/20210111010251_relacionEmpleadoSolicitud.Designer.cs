@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VacacionesTesisApp.Server.Data;
 
 namespace VacacionesTesisApp.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210111010251_relacionEmpleadoSolicitud")]
+    partial class relacionEmpleadoSolicitud
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,12 +255,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FullNameUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsEnabled")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")

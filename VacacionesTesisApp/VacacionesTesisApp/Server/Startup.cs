@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using VacacionesTesisApp.Server.Data;
 using VacacionesTesisApp.Server.Models;
+using VacacionesTesisApp.Server.Helpers;
+using Blazored.Toast;
 
 namespace VacacionesTesisApp.Server
 {
@@ -33,17 +35,20 @@ namespace VacacionesTesisApp.Server
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            services.AddDefaultIdentity<ApplicationUser>(options => { options.SignIn.RequireConfirmedAccount = false; })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>()
+                 .AddProfileService<IdentityProfileService>(); ;
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddBlazoredToast();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

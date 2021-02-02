@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VacacionesTesisApp.Server.Data;
 
 namespace VacacionesTesisApp.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210110014250_nuevosModelos")]
+    partial class nuevosModelos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,12 +257,6 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FullNameUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -337,6 +333,9 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.Property<int>("DiasDisponibles")
                         .HasColumnType("int");
 
+                    b.Property<string>("Direccion")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EmailUsuario")
                         .HasColumnType("nvarchar(max)");
 
@@ -383,11 +382,8 @@ namespace VacacionesTesisApp.Server.Data.Migrations
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmpleadoId")
+                    b.Property<string>("EstatusId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Estatus")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FechaFin")
                         .HasColumnType("datetime2");
@@ -400,7 +396,7 @@ namespace VacacionesTesisApp.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmpleadoId");
+                    b.HasIndex("EstatusId");
 
                     b.ToTable("Solicituds");
                 });
@@ -465,9 +461,9 @@ namespace VacacionesTesisApp.Server.Data.Migrations
 
             modelBuilder.Entity("VacacionesTesisApp.Shared.Models.Solicitud", b =>
                 {
-                    b.HasOne("VacacionesTesisApp.Shared.Models.Empleado", "Empleado")
+                    b.HasOne("VacacionesTesisApp.Shared.Models.Estatus", "Estatus")
                         .WithMany()
-                        .HasForeignKey("EmpleadoId");
+                        .HasForeignKey("EstatusId");
                 });
 #pragma warning restore 612, 618
         }

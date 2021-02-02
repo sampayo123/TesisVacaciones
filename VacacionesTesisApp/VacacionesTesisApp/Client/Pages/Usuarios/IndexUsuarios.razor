@@ -1,0 +1,128 @@
+﻿@page "/usuarios"
+@inject HttpClient http
+@using VacacionesTesisApp.Shared
+@using Blazorise.DataGrid
+@using Blazorise
+@inject NavigationManager navigationManager
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@*@attribute [Authorize(Roles = "Admin")]*@
+@attribute [Authorize]
+
+
+
+<div class="form-row">
+    <div class="col-md-8 col-sm-6 mb-3" align="left">
+        <h3>Administrar Usuarios</h3>
+
+</div>
+</div>
+
+<hr />
+
+
+@if (Lista.Count == 0)
+{
+    <text>No hay registros.</text> }
+else
+{
+
+    <DataGrid TItem="UsuarioModel" Data="Lista" CustomFilter="@OnCustomFilter"
+              ShowPager="true" PageSize="8"
+              Striped="true">
+
+
+        <ChildContent>
+            <DataGridColumn TItem="UsuarioModel" Field="@nameof(UsuarioModel.Nombre)"
+                            Caption="Nombre"></DataGridColumn>
+
+            <DataGridColumn TItem="UsuarioModel" Field="@nameof(UsuarioModel.Email)"
+                            Caption="Email"></DataGridColumn>
+
+            <DataGridColumn TItem="UsuarioModel" Field="@nameof(UsuarioModel.Rol)"
+                            Caption="Rol"></DataGridColumn>
+            @*<DataGridColumn TItem="Showroom" Caption="Estado" Field="@nameof(Showroom.Estado)">
+                    <DisplayTemplate>
+                        @if (context.Estado is true)
+                        {@String.Format("Activo")}
+                    else
+                    { @String.Format("Inactivo")}
+
+                    </DisplayTemplate>
+                </DataGridColumn>*@
+
+            <DataGridColumn TItem="UsuarioModel" Caption="Acciones" Field="@nameof(UsuarioModel.UserId)">
+                <DisplayTemplate>
+                    <Button Color="Color.Primary" @onclick="@(() => EditarItem(context.UserId))">Editar Rol</Button>
+                    @*<Button Color="Color.Success" @onclick="@(() => EditarItem2(context.UserId))">Editar Nombre</Button>*@
+                </DisplayTemplate>
+            </DataGridColumn>
+        </ChildContent>
+@*
+        <PreviousPageButtonTemplate>
+            <StringEnBotones TipoBoton="atras" />
+        </PreviousPageButtonTemplate>
+        <NextPageButtonTemplate>
+            <StringEnBotones TipoBoton="siguiente" />
+        </NextPageButtonTemplate>
+        <FirstPageButtonTemplate>
+            <StringEnBotones TipoBoton="primero" />
+        </FirstPageButtonTemplate>
+        <LastPageButtonTemplate>
+            <StringEnBotones TipoBoton="ultimo" />
+        </LastPageButtonTemplate>*@
+
+    </DataGrid>}
+
+
+
+@code
+{ public List<UsuarioModel> Lista = new List<UsuarioModel>();
+    private UsuarioModel usuarioMostrar = new UsuarioModel();
+
+
+    private string dateInputValue;
+    string customFilterValue;
+
+    protected override void OnInitialized()
+    {
+        dateInputValue = DateTime.Now.ToString("dd/MM/yyyy");//Fecha del día actual
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Lista = await http.GetFromJsonAsync<List<UsuarioModel>>("api/Usuarios");
+    }
+
+
+    void EditarItem(string Id)
+    {
+
+        navigationManager.NavigateTo($"/usuarios/editar/{Id}");
+    }
+
+
+    void EditarItem2(string Id)
+    {
+
+        navigationManager.NavigateTo($"/usuarios/editarnombre/{Id}");
+    }
+
+
+    bool OnCustomFilter(UsuarioModel model)
+    {
+        if (string.IsNullOrEmpty(customFilterValue))
+            return true;
+
+        return
+            model.Nombre?.Contains(customFilterValue, StringComparison.OrdinalIgnoreCase) == true;
+
+
+    }
+@*
+    void OnSelectedRowStyling(UsuarioModel usuarioModel, DataGridRowStyling styling)
+    {
+        styling.Background = Background.Info;
+
+    }*@
+}
