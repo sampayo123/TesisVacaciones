@@ -54,21 +54,33 @@
                 {
                     foreach (var elemento in ListaSolicitudesVacaciones)
                     {
-                        <tr>
+                <tr>
 
 
-                            <td>@NombreMostrar</td>
-                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                            <td>@elemento.Descripcion </td>
-                            <td>@elemento.Estatus</td>
-                            <td>@elemento.CantidadDias</td>
-                            <td>
-                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
-                            </td>
+                    <td>@elemento.Empleado.Nombre</td>
+                    <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                    <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                    <td>@elemento.Descripcion </td>
+                    <td>@elemento.Estatus</td>
+                    <td>@elemento.CantidadDias</td>
+
+                    @if (elemento.Estatus == "Generada")
+                    {
+                        <td>
+                            <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                         
+                        </td>
+                    }
 
 
-                        </tr>
+
+
+                </tr>
 
                     }
                 }
@@ -143,12 +155,12 @@
 
             @if (editar == false)
             {
-                <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
+                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Crear</button>
 
             }
             else
             {
-                <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
+                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Editar</button>
             }
     </EditForm>
 </Modal>
@@ -196,10 +208,7 @@
 
             Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
             ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
-            if (Empleado.Id != null)
-            {
-                NombreMostrar = Empleado.Nombre;
-            }
+
 
         }
         catch (AccessTokenNotAvailableException exception)
@@ -255,10 +264,19 @@
         {
 
 
-            if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
+            if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
             {
-                toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles","Advertencia");
-                Console.WriteLine("No puede ser mayor");
+
+                if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+                {
+                    toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
+                }
+
+                if(SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
+                {
+
+                    toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles","Advertencia");
+                }
             }
             else
             {
@@ -287,10 +305,41 @@
         }
         else
         {
-            var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
-            toast.ShowSuccess("Se actualizo correctamente", "Exito");
-            Console.WriteLine("Editar");
-            Modal.Ocultar();
+            if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+            {
+
+                if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+                {
+                    toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
+                }
+
+                if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
+                {
+
+                    toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles", "Advertencia");
+                }
+            }
+            else
+            {
+
+                var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
+
+                string configuracion = repuesta.StatusCode.ToString();
+                if (configuracion.Equals("OK"))
+                {
+                    toast.ShowSuccess("Se actualizo correctamente", "Exito");
+                    Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
+                    await http.PutAsJsonAsync("api/empleados", Empleado);
+                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                    SolicitudVacaciones = new Solicitud();
+                }
+                else
+                {
+                    toast.ShowError("Error del sistema", "Exito");
+                }
+                Console.WriteLine("Editar");
+                Modal.Ocultar();
+            }
         }
 
 

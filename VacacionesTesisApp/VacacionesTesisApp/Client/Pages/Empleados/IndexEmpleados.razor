@@ -2,12 +2,13 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [Authorize]
+@inject NavigationManager navigation
 @inject HttpClient http
 @inject IToastService toast
 @page "/empleados"
 <h3>Empleados</h3>
 <div>
-    <button type="button" class="btn btn-info"  style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
+    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
 
 </div>
 <hr>
@@ -49,7 +50,7 @@
                             <td>
                                 <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
                                 <a style="color:#ffff;" class="oi oi-eye btn btn-info" title="Ver" @onclick="(()=>MostrarModalVer(elemento))"></a> |
-                                <a title="Historial"><span class="oi oi-clipboard btn btn-primary" /></a>
+                                <a title="Historial"><span class="oi oi-clipboard btn btn-primary" @onclick="(() => VerHistorial (elemento))" /></a>
                             </td>
 
 
@@ -258,7 +259,7 @@
             Console.WriteLine(IdCreador);
             NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
             Console.WriteLine(NombreUsuario);
-           // RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+            // RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
         }
 
@@ -278,7 +279,7 @@
 
     string EmailUsuario;
     string IdCreador;
-    string NombreUsuario="";
+    string NombreUsuario = "";
     string RolUsuario;
 
     protected override async Task OnInitializedAsync()
@@ -343,6 +344,18 @@
         Modal.Mostrar();
     }
 
+
+
+    void VerHistorial(Empleado empleado)
+    {
+        navigation.NavigateTo($"empleado/historialempleado/{empleado.Id}");
+
+        //navigation.NavigateTo("historialempleado");
+   @*     Ver = true;
+        Empleado = empleado;
+        Modal.Mostrar();*@
+    }
+
     async Task Acciones()
     {
 
@@ -358,7 +371,7 @@
         else
         {
             var repuesta = await http.PutAsJsonAsync("api/empleados", Empleado);
-            
+
             Console.WriteLine("Editar");
         }
 

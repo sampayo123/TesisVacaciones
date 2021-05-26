@@ -82,8 +82,8 @@ namespace VacacionesTesisApp.Server.Controllers
         [HttpPut]
         public async Task<IActionResult> PutSolicitud(Solicitud solicitud)
         {
-            await _context.SaveChangesAsync();
             _context.Entry(solicitud).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return Ok(solicitud);
         }
        
