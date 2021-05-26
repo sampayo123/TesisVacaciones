@@ -8,6 +8,8 @@ a, .btn-link {
     color: #0366d6;
 }
 
+
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -47,9 +49,21 @@ app {
     text-overflow: ellipsis;
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+.rz-panel-menu .rz-navigation-item-link {
+    padding: 0 1.25rem 0 1.25rem;
+    color: inherit;
 }
+.sidebar {
+    /* background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);*/
+    /*background-image: linear-gradient(180deg, rgba(16, 111, 236) 0%,red 70%);
+    color: black;*/
+    background-color: #3a474d;
+    border-right: 1px solid #eaeef0;
+    position: fixed;
+    overflow: auto;
+    left: 0;
+}
+
 
     .sidebar .top-row {
         background-color: rgba(0,0,0,0.4);
@@ -80,7 +94,9 @@ app {
         }
 
         .sidebar .nav-item a {
-            color: #d7d7d7;
+            /*color: #d7d7d7;*/
+            padding: 0 1.25rem 0 1.25rem;
+            color: white;
             border-radius: 4px;
             height: 3rem;
             display: flex;

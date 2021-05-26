@@ -101,14 +101,14 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account.Manage
                     protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Confirme su email",
+                    $"Confirme su cuenta mediante <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Haciendo click aqui</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                StatusMessage = "Enlace de confirmación para cambiar el correo electrónico enviado. Por favor, compruebe su correo electrónico.";
                 return RedirectToPage();
             }
 
-            StatusMessage = "Your email is unchanged.";
+            StatusMessage = "Su correo electrónico no ha cambiado.";
             return RedirectToPage();
         }
 
@@ -137,10 +137,10 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account.Manage
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                "Confirme su correo electrónico",
+                $"Confirme su cuenta mediante <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>haciendo clic aquí</a>.");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "Se ha enviado un correo electrónico de verificación. Por favor, compruebe su correo electrónico.";
             return RedirectToPage();
         }
     }

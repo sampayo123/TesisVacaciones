@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
 using VacacionesTesisApp.Server.Data;
 using VacacionesTesisApp.Shared.Models;
 
@@ -42,37 +43,50 @@ namespace VacacionesTesisApp.Server.Controllers
             return Ok(solicitud);
         }
 
-        // PUT: api/Solicitud/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut]
-        public async Task<IActionResult> PutSolicitud(string id, Solicitud solicitud)
+        
+        [HttpGet("SolicitudPermiso/{id}")]
+        public async Task<ActionResult<Solicitud>> GetSolicitudPermisos(string id)
         {
-            if (id != solicitud.Id)
-            {
-                return BadRequest();
-            }
+            var solicitud = await _context.Solicituds.Include(x => x.Empleado).Where(x => x.EmpleadoId == id && x.Tipo == "Permiso").ToListAsync();
 
-            _context.Entry(solicitud).State = EntityState.Modified;
-
-            try
+            if (solicitud == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SolicitudExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return Ok(solicitud);
         }
+
+
+        [HttpGet("SolicitudVacaciones/{id}")]
+        public async Task<ActionResult<Solicitud>> GetSolicitudVacaciones(string id)
+        {
+            var solicitud = await _context.Solicituds.Include(x => x.Empleado).Where(x => x.EmpleadoId == id && x.Tipo == "Vacaciones").ToListAsync();
+
+            if (solicitud == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(solicitud);
+        }
+
+
+
+
+
+        // PUT: api/Solicitud/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+
+        [HttpPut]
+        public async Task<IActionResult> PutSolicitud(Solicitud solicitud)
+        {
+            await _context.SaveChangesAsync();
+            _context.Entry(solicitud).State = EntityState.Modified;
+            return Ok(solicitud);
+        }
+       
 
         // POST: api/Solicitud
         // To protect from overposting attacks, enable the specific properties you want to bind to, for

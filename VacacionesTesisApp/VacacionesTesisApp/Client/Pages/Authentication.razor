@@ -1,7 +1,33 @@
 @page "/authentication/{action}"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-<RemoteAuthenticatorView Action="@Action" />
+<RemoteAuthenticatorView Action="@Action" >
+
+@*authentication/login*@
+
+    <LoggingIn>Inicar sesión</LoggingIn>
+
+    @*authentication/login-callback*@
+    <CompletingLoggingIn>@Sesion iniciada</CompletingLoggingIn>
+    @*authentication/login-failed*@
+    <LogInFailed>Fallo el inicio de sesión</LogInFailed>
+    @*authentication/logout*@
+    <LogOut><p>Cerrando sesión</p> </LogOut>
+    @*authentication/logout-callback*@
+<CompletingLogOut>@Sesion cerrada </CompletingLogOut>
+    @*authentication/logout-failed*@
+<LogOutFailed>Fallo el cierre de sesión</LogOutFailed>
+    @*authentication/logged-out*@
+    <LogOutSucceeded> Has cerrado la sesión.</LogOutSucceeded>
+    @*authentication/profile*@
+    <UserProfile>Autenticando...</UserProfile>
+    @*authentication/register*@
+    <Registering>Registrando</Registering>
+  
+    
+</RemoteAuthenticatorView>
 
 @code{
     [Parameter] public string Action { get; set; }
+
+    string Sesion = "Sesión";
 }

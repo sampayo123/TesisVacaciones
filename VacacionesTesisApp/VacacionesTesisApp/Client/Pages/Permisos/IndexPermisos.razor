@@ -1,6 +1,287 @@
 ﻿@page "/permisos"
-<h3>Index Permisos</h3>
+@inject IJSRuntime js
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+@inject HttpClient http
+@inject IToastService toast
+<h3>Permisos</h3>
+<div>
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+            <label></label>
+            <div>
+                <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<hr>
+<div class="card">
+
+    <div class="card-body" style="overflow-x:auto;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha inicio</th>
+                    <th scope="col">Fecha Fin</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Estatus</th>
+                    <th scope="col">Dias a tomar</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (ListaSolicitudPermisos == null)
+                {
+                    <text>Cargando.....</text>
+                }
+                else if (ListaSolicitudPermisos.Count == 0)
+                {
+                    <text>Sin registros .....</text>
+                }
+                else
+                {
+                    foreach (var elemento in ListaSolicitudPermisos)
+                    {
+                        <tr>
+
+
+                            <td>@NombreMostrar</td>
+                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.Descripcion </td>
+                            <td>@elemento.Estatus</td>
+                            <td>@elemento.CantidadDias</td>
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
+                            </td>
+
+
+                        </tr>
+
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+    <EditForm Model="@SolicitudPermisos">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha inicio: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="SolicitudPermisos.FechaInicio" placeholder="Fecha inicio" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha fin: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="SolicitudPermisos.FechaFin" placeholder="Fecha Fin" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <div class="form-group">
+                    <label>Descripción: </label>
+                    <div>
+                        <input class="form-control" type="text" @bind-value="SolicitudPermisos.Descripcion"
+                               placeholder="Descripción" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Cantidad de dias: </label>
+                    @if (SolicitudPermisos.FechaInicio != SolicitudPermisos.FechaFin)
+                    {
+                        SolicitudPermisos.CantidadDias = 1;
+                        cantidaddias = (SolicitudPermisos.FechaFin - SolicitudPermisos.FechaInicio).TotalDays;
+                        cantidaddias = cantidaddias + 1;
+                        SolicitudPermisos.CantidadDias = SolicitudPermisos.CantidadDias + Convert.ToInt32(cantidaddias);
+                    }
+                    else
+                    {
+                        SolicitudPermisos.CantidadDias = 1;
+                    }
+                    <input class="form-control" type="text" @bind-value="SolicitudPermisos.CantidadDias" disabled />
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Estatus: </label>
+                    <div>
+                        <input class="form-control" type="text" @bind-value="SolicitudPermisos.Estatus" disabled />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (editar == false)
+        {
+            <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
+
+        }
+        else
+        {
+            <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
+        }
+    </EditForm>
+</Modal>
+
+<AuthorizeView>
+    <Authorized>
+        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+        @if (context.User.Identity.Name != null)
+        {
+            EmailUsuario = @context.User.Identity.Name;
+            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+
+        }
+
+    </Authorized>
+</AuthorizeView>
 
 @code {
+
+    Modal Modal;
+    bool editar = false;
+    bool Ver = false;
+    public Solicitud SolicitudPermisos { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudPermisos { get; set; } = new List<Solicitud>();
+    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+    public Empleado Empleado { get; set; } = new Empleado();
+
+    string EmailUsuario;
+    string IdCreador;
+    string NombreUsuario;
+    string RolUsuario;
+    string NombreMostrar;
+
+    Double cantidaddias;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+            Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
+            ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+            if (Empleado.Id != null)
+            {
+                NombreMostrar = Empleado.Nombre;
+            }
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
+    }
+
+    async Task OcultarModal()
+    {
+        if (editar == true)
+        {
+
+            ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+            SolicitudPermisos = ListaSolicitudPermisos.First(x => x.Id.Equals(SolicitudPermisos.Id));
+        }
+
+
+        SolicitudPermisos = new Solicitud();
+        Modal.Ocultar();
+    }
+
+    void MostrarModal()
+    {
+        editar = false;
+        Ver = false;
+
+        SolicitudPermisos = new Solicitud();
+        if (SolicitudPermisos.Id == null)
+        {
+
+            SolicitudPermisos.Estatus = "Generada";
+            SolicitudPermisos.FechaInicio = DateTime.Now;
+            SolicitudPermisos.FechaFin = DateTime.Now;
+
+        }
+        Modal.Mostrar();
+
+
+    }
+    void MostrarModalEditar(Solicitud solicitud)
+    {
+        editar = true;
+        Ver = false;
+        SolicitudPermisos = solicitud;
+        Modal.Mostrar();
+    }
+
+    async Task Acciones()
+    {
+
+        if (SolicitudPermisos.Id == null)
+        {
+
+
+
+            SolicitudPermisos.EmpleadoId = Empleado.Id;
+            SolicitudPermisos.Estatus = "Generada";
+            SolicitudPermisos.Tipo = "Permiso";
+            var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudPermisos);
+            string configuracion = respuestas.StatusCode.ToString();
+            if (configuracion.Equals("OK"))
+            {
+                toast.ShowSuccess("Se creo correctamente", "Exito");
+                Console.WriteLine("Exito");
+                await http.PutAsJsonAsync("api/empleados", Empleado);
+                ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                SolicitudPermisos = new Solicitud();
+                Modal.Ocultar();
+            }
+            else
+            {
+            }
+
+
+
+
+        }
+        else
+        {
+            var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudPermisos);
+            toast.ShowSuccess("Se actualizo correctamente", "Exito");
+            Console.WriteLine("Editar");
+            Modal.Ocultar();
+        }
+
+
+    }
+
 
 }

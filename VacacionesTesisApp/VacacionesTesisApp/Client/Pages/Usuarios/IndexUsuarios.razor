@@ -53,7 +53,7 @@ else
 
             <DataGridColumn TItem="UsuarioModel" Caption="Acciones" Field="@nameof(UsuarioModel.UserId)">
                 <DisplayTemplate>
-                    <Button Color="Color.Primary" @onclick="@(() => EditarItem(context.UserId))">Editar Rol</Button>
+                    <Button Color="Color.Primary" style="background-color:#738b95 !important" @onclick="@(() => EditarItem(context.UserId))">Editar Rol</Button>
                     @*<Button Color="Color.Success" @onclick="@(() => EditarItem2(context.UserId))">Editar Nombre</Button>*@
                 </DisplayTemplate>
             </DataGridColumn>
