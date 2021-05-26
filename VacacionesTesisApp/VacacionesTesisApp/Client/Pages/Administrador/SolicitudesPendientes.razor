@@ -1,0 +1,243 @@
+﻿@page "/solicitudespendientes"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+@inject HttpClient http
+@inject IToastService toast
+<h3>Solicitudes pendientes por aprobar</h3>
+
+<div class="card">
+
+    <div class="card-body" style="overflow-x:auto;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Fecha inicio</th>
+                    <th scope="col">Fecha Fin</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Estatus</th>
+                    <th scope="col">Dias a tomar</th>
+                    <th scope="col">Tipo</th>
+
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (ListaSolicitudes == null)
+                {
+                    <text>Cargando...</text>
+                }
+                else if (ListaSolicitudes.Count == 0)
+                {
+                    <text>Sin registros...</text>
+                }
+                else
+                {
+                    foreach (var elemento in ListaSolicitudes)
+                    {
+                        <tr>
+
+
+                            <td>@elemento.Empleado.Nombre</td>
+                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.Descripcion </td>
+                            <td>@elemento.Estatus</td>
+                            <td>@elemento.CantidadDias</td>
+                            <td>@elemento.Tipo</td>
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Cambiar estatus" @onclick="(()=>Aprobar(elemento))"></a>
+                            </td>
+
+
+                        </tr>
+
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<Modal @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
+    <EditForm Model="@Solicitud">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha inicio: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha fin: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <div class="form-group">
+                    <label>Descripción: </label>
+                    <div>
+                        <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
+                               placeholder="Descripción" disabled />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Cantidad de dias: </label>
+                    <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Estatus: </label>
+                    <div>
+                        <select class="form-control" @bind="Solicitud.Estatus">
+                            <option disabled>Seleccione</option>
+
+                            @foreach(var items in ListaEstados)
+                            {
+                                <option value="@items.Descripcion">@items.Descripcion</option>
+                            }
+                        </select>
+          @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <a class="btn btn-success" @onclick="(() => Acciones())">Aprobar</a>
+
+
+    </EditForm>
+</Modal>
+
+<AuthorizeView>
+    <Authorized>
+        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+        @if (context.User.Identity.Name != null)
+        {
+            EmailUsuario = @context.User.Identity.Name;
+            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+
+        }
+
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+    Modal Modal;
+    bool editar = false;
+    bool Ver = false;
+    public Solicitud Solicitud { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudes { get; set; } = new List<Solicitud>();
+    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+    public Empleado Empleado { get; set; } = new Empleado();
+    string EmailUsuario;
+    string IdCreador;
+    string NombreUsuario;
+    string RolUsuario;
+    string NombreMostrar;
+
+    public class Estado
+    {
+        public string Id { get; set; }
+        public string Descripcion { get; set; }
+    }
+
+    public List<Estado> ListaEstados = new List<Estado>();
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+
+            ListaEstados = new List<Estado>()
+            {
+                new Estado {Id="gen123",Descripcion= "Generada"},
+                new Estado {Id="gen123",Descripcion= "Aprobada"},
+                new Estado {Id="gen123",Descripcion= "Desaprobada"},
+            };
+
+            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/");
+
+
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
+    }
+
+    void Aprobar(Solicitud solicitud)
+    {
+
+        editar = false;
+        Ver = false;
+
+        Solicitud = new Solicitud();
+        if (solicitud.Estatus == "Generada")
+        {
+
+            Solicitud = solicitud;
+            Modal.Mostrar();
+        }
+        else
+        {
+            Solicitud = solicitud;
+            Modal.Mostrar();
+        }
+
+    }
+
+
+    async Task Acciones()
+    {
+
+        var repuesta = await http.PutAsJsonAsync("api/solicitud", Solicitud);
+        toast.ShowSuccess("Se actualizo correctamente", "Exito");
+        Modal.Ocultar();
+
+
+
+    }
+
+    async Task OcultarModal()
+    {
+        @*if (editar == true)
+        {
+
+            ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+            SolicitudPermisos = ListaSolicitudPermisos.First(x => x.Id.Equals(SolicitudPermisos.Id));
+        }
+
+
+        SolicitudPermisos = new Solicitud();*@
+        Modal.Ocultar();
+    }
+
+
+
+}

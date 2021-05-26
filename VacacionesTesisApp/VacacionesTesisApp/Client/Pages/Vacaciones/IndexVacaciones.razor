@@ -5,13 +5,13 @@
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
-<h3>Index Vacaciones</h3>
+<h3>Vacaciones</h3>
 <div>
     <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-12">
             <label></label>
             <div>
-            <button type="button" class="btn btn-info" @onclick="MostrarModal">Crear nuevo solicitud</button>
+            <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
             </div>
         </div>
             <div  class="col-lg-3 col-md-3 col-sm-3 col-12">
@@ -195,7 +195,7 @@
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
             Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
             if (Empleado.Id != null)
             {
                 NombreMostrar = Empleado.Nombre;
@@ -214,7 +214,7 @@
         if (editar == true)
         {
 
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
             SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
         }
 
@@ -264,6 +264,7 @@
             {
                 SolicitudVacaciones.EmpleadoId = Empleado.Id;
                 SolicitudVacaciones.Estatus = "Generada";
+                SolicitudVacaciones.Tipo = "Vacaciones";
                 var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
                 string configuracion = respuestas.StatusCode.ToString();
                 if (configuracion.Equals("OK"))
