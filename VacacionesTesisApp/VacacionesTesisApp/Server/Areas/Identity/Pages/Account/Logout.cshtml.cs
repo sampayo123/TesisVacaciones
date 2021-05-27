@@ -31,6 +31,8 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("Usuario desconectado.");
+
+            returnUrl= "https://localhost:44391/";
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

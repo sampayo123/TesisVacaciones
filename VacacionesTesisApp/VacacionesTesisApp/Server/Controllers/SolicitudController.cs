@@ -29,6 +29,36 @@ namespace VacacionesTesisApp.Server.Controllers
             return await _context.Solicituds.Include(x => x.Empleado).ToListAsync();
         }
 
+
+
+        [HttpGet("aprobadas")]
+        public async Task<ActionResult<Solicitud>> Getaprobadas()
+        {
+            var solicitud = await _context.Solicituds.Include(x => x.Empleado).Where(x => x.Estatus=="Aprobada" || x.Estatus =="Desaprobada").ToListAsync();
+
+            if (solicitud == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(solicitud);
+        }
+
+        [HttpGet("generadas")]
+        public async Task<ActionResult<Solicitud>> Getgeneradas()
+        {
+            var solicitud = await _context.Solicituds.Include(x => x.Empleado).Where(x => x.Estatus == "Generada").ToListAsync();
+
+            if (solicitud == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(solicitud);
+        }
+
+
+
         // GET: api/Solicitud/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Solicitud>> GetSolicitud(string id)

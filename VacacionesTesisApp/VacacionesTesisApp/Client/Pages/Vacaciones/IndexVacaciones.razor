@@ -8,19 +8,33 @@
 <h3>Vacaciones</h3>
 <div>
     <div class="row">
-        <div class="col-lg-9 col-md-9 col-sm-9 col-12">
-            <label></label>
-            <div>
-            <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
-            </div>
-        </div>
-            <div  class="col-lg-3 col-md-3 col-sm-3 col-12">
-        <label>Días disponibles:</label>
+        @if (UserCreado)
+        {
+            <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+                <label></label>
                 <div>
-                    <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>     
+                    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
                 </div>
             </div>
-        </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-12">
+                <label>Días disponibles:</label>
+                <div>
+                    <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>
+                </div>
+            </div>
+
+
+        }
+        else
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+                <div>
+                    <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+                </div>
+            </div>
+
+        }
+    </div>
     </div>
 
 
@@ -195,6 +209,10 @@
     string NombreUsuario;
     string RolUsuario;
     string NombreMostrar;
+    int diasguardados;
+
+    bool UserCreado = false;
+
 
     Double cantidaddias;
 
@@ -204,10 +222,18 @@
 
         try
         {
+
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
-            Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+            bool existe = ListaEmpleado.Any(x => x.NombreUsuario == NombreUsuario);
+            if (existe)
+            {
+
+                UserCreado = true;
+                Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
+                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+            }
+
 
 
         }
@@ -291,7 +317,7 @@
                     Console.WriteLine("Exito");
                     Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
                     await http.PutAsJsonAsync("api/empleados", Empleado);
-                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
                     SolicitudVacaciones = new Solicitud();
                     Modal.Ocultar();
                 }
@@ -322,15 +348,32 @@
             else
             {
 
+                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+
+                var solicitudAnteriro = ListaSolicitudesVacaciones.Where(x=>x.EmpleadoId==Empleado.Id && x.Id==SolicitudVacaciones.Id).FirstOrDefault();
+                var cantidadguardad = solicitudAnteriro.CantidadDias;
+
                 var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
 
                 string configuracion = repuesta.StatusCode.ToString();
                 if (configuracion.Equals("OK"))
                 {
                     toast.ShowSuccess("Se actualizo correctamente", "Exito");
-                    Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
-                    await http.PutAsJsonAsync("api/empleados", Empleado);
-                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Empleado.Id}");
+
+
+                    if (SolicitudVacaciones.CantidadDias==cantidadguardad)
+                    {
+                        Empleado.DiasDisponibles = Empleado.DiasDisponibles;
+                    }
+                    else
+                    {
+                        Empleado.DiasDisponibles = Empleado.DiasDisponibles + cantidadguardad;
+                        Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
+
+                        await http.PutAsJsonAsync("api/empleados", Empleado);
+                        ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+                    }
+
                     SolicitudVacaciones = new Solicitud();
                 }
                 else

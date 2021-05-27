@@ -8,12 +8,23 @@
 <h3>Permisos</h3>
 <div>
     <div class="row">
-        <div class="col-lg-9 col-md-9 col-sm-9 col-12">
-            <label></label>
-            <div>
-                <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+        @if (UserCreado)
+        {
+            <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+                <label></label>
+                <div>
+                    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+                <div>
+                    <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -186,7 +197,7 @@
     string NombreUsuario;
     string RolUsuario;
     string NombreMostrar;
-
+    bool UserCreado = false;
     Double cantidaddias;
 
     protected override async Task OnInitializedAsync()
@@ -195,8 +206,16 @@
         try
         {
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
-            Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
-            ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+
+            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+            bool existe = ListaEmpleado.Any(x => x.NombreUsuario == NombreUsuario);
+            if (existe)
+            {
+                UserCreado = true;
+                Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
+                ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+            }
 
 
         }
@@ -229,7 +248,6 @@
         SolicitudPermisos = new Solicitud();
         if (SolicitudPermisos.Id == null)
         {
-
             SolicitudPermisos.Estatus = "Generada";
             SolicitudPermisos.FechaInicio = DateTime.Now;
             SolicitudPermisos.FechaFin = DateTime.Now;
@@ -256,25 +274,6 @@
             if (SolicitudPermisos.FechaFin.Date < SolicitudPermisos.FechaInicio.Date)
             {
                 toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
-            }else if (SolicitudPermisos.FechaFin.Date == SolicitudPermisos.FechaInicio.Date)
-            {
-                SolicitudPermisos.EmpleadoId = Empleado.Id;
-                SolicitudPermisos.Estatus = "Generada";
-                SolicitudPermisos.Tipo = "Permiso";
-                var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudPermisos);
-                string configuracion = respuestas.StatusCode.ToString();
-                if (configuracion.Equals("OK"))
-                {
-                    toast.ShowSuccess("Se creo correctamente", "Exito");
-                    Console.WriteLine("Exito");
-                    await http.PutAsJsonAsync("api/empleados", Empleado);
-                    ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
-                    SolicitudPermisos = new Solicitud();
-                    Modal.Ocultar();
-                }
-                else
-                {
-                }
             }
             else
             {
@@ -287,7 +286,6 @@
                 if (configuracion.Equals("OK"))
                 {
                     toast.ShowSuccess("Se creo correctamente", "Exito");
-                    Console.WriteLine("Exito");
                     await http.PutAsJsonAsync("api/empleados", Empleado);
                     ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
                     SolicitudPermisos = new Solicitud();
@@ -295,6 +293,7 @@
                 }
                 else
                 {
+                    toast.ShowError("Error del sistema", "Exito");
                 }
 
 
@@ -309,27 +308,19 @@
             {
                 toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
             }
-            else if (SolicitudPermisos.FechaFin.Date == SolicitudPermisos.FechaInicio.Date)
-        {
+            else
+            {
+                var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudPermisos);
+                toast.ShowSuccess("Se actualizo correctamente", "Exito");
+                Console.WriteLine("Editar");
+                Modal.Ocultar();
+            }
 
-            var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudPermisos);
-            toast.ShowSuccess("Se actualizo correctamente", "Exito");
-            Console.WriteLine("Editar");
-            Modal.Ocultar();
-        }
-        else
-        {
-            var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudPermisos);
-            toast.ShowSuccess("Se actualizo correctamente", "Exito");
-            Console.WriteLine("Editar");
-            Modal.Ocultar();
+
         }
 
 
     }
-
-
-}
 
 
 }

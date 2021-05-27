@@ -1,8 +1,9 @@
 @page "/authentication/{action}"
+@inject NavigationManager navigation
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-<RemoteAuthenticatorView Action="@Action" >
+<RemoteAuthenticatorView Action="@Action">
 
-@*authentication/login*@
+    @*authentication/login*@
 
     <LoggingIn>Cargando...</LoggingIn>
 
@@ -13,21 +14,22 @@
     @*authentication/logout*@
     <LogOut><p>Cerrando...</p> </LogOut>
     @*authentication/logout-callback*@
-<CompletingLogOut>@Sesion cerrada </CompletingLogOut>
+    <CompletingLogOut>@Sesion cerrada </CompletingLogOut>
     @*authentication/logout-failed*@
-<LogOutFailed>Fallo el cierre</LogOutFailed>
+    <LogOutFailed>Fallo el cierre</LogOutFailed>
     @*authentication/logged-out*@
-    <LogOutSucceeded> Has cerrado correctamente.</LogOutSucceeded>
+    <LogOutSucceeded> Has cerrado correctamente. </LogOutSucceeded>
     @*authentication/profile*@
     <UserProfile>Autenticando...</UserProfile>
     @*authentication/register*@
     <Registering>Registrando...</Registering>
-  
-    
+
+
 </RemoteAuthenticatorView>
 
 @code{
     [Parameter] public string Action { get; set; }
 
     string Sesion = "Sesión";
+
 }
