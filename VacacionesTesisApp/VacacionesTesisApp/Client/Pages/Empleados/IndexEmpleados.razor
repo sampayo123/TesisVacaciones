@@ -349,11 +349,6 @@
     void VerHistorial(Empleado empleado)
     {
         navigation.NavigateTo($"empleado/historialempleado/{empleado.Id}");
-
-        //navigation.NavigateTo("historialempleado");
-   @*     Ver = true;
-        Empleado = empleado;
-        Modal.Mostrar();*@
     }
 
     async Task Acciones()
@@ -361,8 +356,6 @@
 
         if (Empleado.Id == null)
         {
-
-
             var respuestas = await http.PostAsJsonAsync("api/empleados", Empleado);
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
             Console.WriteLine("Creado");

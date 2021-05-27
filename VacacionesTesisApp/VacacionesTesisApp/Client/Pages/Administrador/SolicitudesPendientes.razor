@@ -185,7 +185,7 @@
                 new Estado {Id="gen123",Descripcion= "Desaprobada"},
             };
 
-            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/");
+            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/generadas");
 
 
         }
@@ -246,17 +246,8 @@
 
     }
 
-    async Task OcultarModal()
+    void OcultarModal()
     {
-        @*if (editar == true)
-        {
-
-            ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
-            SolicitudPermisos = ListaSolicitudPermisos.First(x => x.Id.Equals(SolicitudPermisos.Id));
-        }
-
-
-        SolicitudPermisos = new Solicitud();*@
         Modal.Ocultar();
     }
 

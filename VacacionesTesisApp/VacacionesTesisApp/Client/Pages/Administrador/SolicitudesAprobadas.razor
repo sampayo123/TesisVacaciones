@@ -1,12 +1,11 @@
-﻿@page "/empleado/historialempleado/{Id}"
-
+﻿@page "/solicitudesaprobadas"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
+<h3>Solicitudes aprobadas</h3>
 
-<h3>Historial Empleado</h3>
 <div class="card">
 
     <div class="card-body" style="overflow-x:auto;">
@@ -18,9 +17,7 @@
                     <th scope="col">Fecha Fin</th>
                     <th scope="col">Descripción</th>
                     <th scope="col">Datos de la solicitud</th>
-
-
-                    <th scope="col">Acción</th>
+                    <th scope="col">Estatus</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,12 +46,11 @@
                             <td>@elemento.Descripcion </td>
 
                             <td>
-                                <div class="col-12"><strong> @String.Format("Estatus:")</strong>@elemento.Estatus</div>
                                 <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@elemento.CantidadDias</div>
                                 <div class="col-12"> <strong>@String.Format("Tipo: ")</strong>@elemento.Tipo</div>
                             </td>
                             <td>
-                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Cambiar estatus" @onclick="(()=>Aprobar(elemento))"></a>
+                                @elemento.Estatus
                             </td>
 
 
@@ -68,72 +64,6 @@
     </div>
 
 </div>
-
-<Modal @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
-    <EditForm Model="@Solicitud">
-        <DataAnnotationsValidator />
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Fecha inicio: </label>
-                    <div>
-                        <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Fecha fin: </label>
-                    <div>
-                        <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 mb-3">
-                <div class="form-group">
-                    <label>Descripción: </label>
-                    <div>
-                        <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
-                               placeholder="Descripción" disabled />
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Cantidad de dias: </label>
-                    <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Estatus: </label>
-                    <div>
-                        <select class="form-control" @bind="Solicitud.Estatus">
-                            <option disabled>Seleccione</option>
-
-                            @foreach (var items in ListaEstados)
-                            {
-                                <option value="@items.Descripcion">@items.Descripcion</option>
-                            }
-                        </select>
-                        @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <a class="btn btn-success" @onclick="(() => Acciones())">Aprobar</a>
-
-
-    </EditForm>
-</Modal>
 
 <AuthorizeView>
     <Authorized>
@@ -154,7 +84,6 @@
 @code {
 
     Modal Modal;
-    [Parameter] public string Id { get; set; }
     bool editar = false;
     bool Ver = false;
     public Solicitud Solicitud { get; set; } = new Solicitud();
@@ -187,7 +116,7 @@
                 new Estado {Id="gen123",Descripcion= "Desaprobada"},
             };
 
-            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/{Id}");
+            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/aprobadas");
 
 
         }
@@ -248,15 +177,20 @@
 
     }
 
-    void OcultarModal()
+    async Task OcultarModal()
     {
+        @*if (editar == true)
+            {
+
+                ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+                SolicitudPermisos = ListaSolicitudPermisos.First(x => x.Id.Equals(SolicitudPermisos.Id));
+            }
+
+
+            SolicitudPermisos = new Solicitud();*@
         Modal.Ocultar();
     }
 
 
 
 }
-
-
-
-

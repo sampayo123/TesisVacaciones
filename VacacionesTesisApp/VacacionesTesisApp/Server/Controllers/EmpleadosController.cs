@@ -55,21 +55,9 @@ namespace VacacionesTesisApp.Server.Controllers
 
             _context.Entry(empleado).State = EntityState.Modified;
 
-            try
-            {
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-/*                if (!EmpleadoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }*/
-            }
+            
+
 
             return Ok(empleado.Id);
         }
