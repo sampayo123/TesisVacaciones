@@ -93,7 +93,7 @@
 
 </div>
 
-<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+<ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
     <EditForm Model="@SolicitudPermisos">
         <DataAnnotationsValidator />
         <div class="row">
@@ -122,6 +122,7 @@
                         <input class="form-control" type="text" @bind-value="SolicitudPermisos.Descripcion"
                                placeholder="Descripción" />
                     </div>
+                    <ValidationMessage For="@(() => SolicitudPermisos.Descripcion)" />
                 </div>
             </div>
 
@@ -154,18 +155,12 @@
                 </div>
             </div>
         </div>
-
-        @if (editar == false)
-        {
-            <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
-
-        }
-        else
-        {
-            <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
-        }
+        <div class="mb-2 pb-2">
+            <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+            <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+        </div>
     </EditForm>
-</Modal>
+</ModalVer>
 
 <AuthorizeView>
     <Authorized>
@@ -184,7 +179,7 @@
 
 @code {
 
-    Modal Modal;
+    ModalVer Modal;
     bool editar = false;
     bool Ver = false;
     public Solicitud SolicitudPermisos { get; set; } = new Solicitud();
@@ -192,6 +187,7 @@
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
 
+    string Titulo;
     string EmailUsuario;
     string IdCreador;
     string NombreUsuario;
@@ -199,6 +195,8 @@
     string NombreMostrar;
     bool UserCreado = false;
     Double cantidaddias;
+    string ButtonGuardar = "Guardar";
+    string ButtonCancelar = "Cancelar";
 
     protected override async Task OnInitializedAsync()
     {
@@ -244,7 +242,7 @@
     {
         editar = false;
         Ver = false;
-
+        Titulo = "Crear solicitud permiso";
         SolicitudPermisos = new Solicitud();
         if (SolicitudPermisos.Id == null)
         {
@@ -260,6 +258,7 @@
     void MostrarModalEditar(Solicitud solicitud)
     {
         editar = true;
+        Titulo = "Editar solicitud permiso";
         Ver = false;
         SolicitudPermisos = solicitud;
         Modal.Mostrar();

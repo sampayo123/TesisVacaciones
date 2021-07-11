@@ -198,3 +198,11 @@ app {
         display: block;
     }
 }
+
+#ModalCrear, #ModalCuenta, #AnalisisCausas {
+    height: 400px;
+}
+
+.modal-body {
+    overflow-y: scroll;
+}

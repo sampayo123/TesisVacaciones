@@ -2,24 +2,34 @@
 @inject HttpClient http
 @using VacacionesTesisApp.Shared
 @using Blazorise.DataGrid
-@using Blazorise
 @inject NavigationManager navigationManager
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@*@attribute [Authorize(Roles = "Admin")]*@
-@attribute [Authorize]
+@*@attribute [Authorize(Roles = "Asesor, Admin")]*@
+@*@attribute [Authorize]*@
 
 
 
 <div class="form-row">
     <div class="col-md-8 col-sm-6 mb-3" align="left">
         <h3>Administrar Usuarios</h3>
-
-</div>
+        <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-3" align="right">
+        <h5>
+            <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+        </h5>
+    </div>
 </div>
 
 <hr />
 
+<div class="form-row">
+    <div class="col-md-10 mb-3" align="right">
+        <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar usuarios..." />
+    </div>
+</div>
+<br />
 
 @if (Lista.Count == 0)
 {
@@ -28,7 +38,7 @@ else
 {
 
     <DataGrid TItem="UsuarioModel" Data="Lista" CustomFilter="@OnCustomFilter"
-              ShowPager="true" PageSize="8"
+              ShowPager="true" PageSize="8" SelectedRowStyling="@OnSelectedRowStyling"
               Striped="true">
 
 
@@ -41,24 +51,17 @@ else
 
             <DataGridColumn TItem="UsuarioModel" Field="@nameof(UsuarioModel.Rol)"
                             Caption="Rol"></DataGridColumn>
-            @*<DataGridColumn TItem="Showroom" Caption="Estado" Field="@nameof(Showroom.Estado)">
-                    <DisplayTemplate>
-                        @if (context.Estado is true)
-                        {@String.Format("Activo")}
-                    else
-                    { @String.Format("Inactivo")}
 
-                    </DisplayTemplate>
-                </DataGridColumn>*@
 
             <DataGridColumn TItem="UsuarioModel" Caption="Acciones" Field="@nameof(UsuarioModel.UserId)">
                 <DisplayTemplate>
-                    <Button Color="Color.Primary" style="background-color:#738b95 !important" @onclick="@(() => EditarItem(context.UserId))">Editar Rol</Button>
-                    @*<Button Color="Color.Success" @onclick="@(() => EditarItem2(context.UserId))">Editar Nombre</Button>*@
+                    <Button Color="Color.Primary" title="Editar rol" @onclick="@(() => EditarItem(context.UserId))">
+                        <Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.UserCog" Style="" />
+                    </Button>
                 </DisplayTemplate>
             </DataGridColumn>
         </ChildContent>
-@*
+
         <PreviousPageButtonTemplate>
             <StringEnBotones TipoBoton="atras" />
         </PreviousPageButtonTemplate>
@@ -70,7 +73,7 @@ else
         </FirstPageButtonTemplate>
         <LastPageButtonTemplate>
             <StringEnBotones TipoBoton="ultimo" />
-        </LastPageButtonTemplate>*@
+        </LastPageButtonTemplate>
 
     </DataGrid>}
 
@@ -119,10 +122,10 @@ else
 
 
     }
-@*
+
     void OnSelectedRowStyling(UsuarioModel usuarioModel, DataGridRowStyling styling)
     {
         styling.Background = Background.Info;
 
-    }*@
+    }
 }

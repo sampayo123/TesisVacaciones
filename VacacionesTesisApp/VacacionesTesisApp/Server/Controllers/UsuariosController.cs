@@ -18,7 +18,7 @@ namespace VacacionesTesisApp.Server.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-   /* [Authorize]*/
+    [Authorize]
     public class UsuariosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -28,12 +28,12 @@ namespace VacacionesTesisApp.Server.Controllers
 
         public UsuariosController(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-           // RoleManager<IdentityRole> roleManager,
+            RoleManager<IdentityRole> roleManager,
             IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory)
         {
             this.context = context;
             this.userManager = userManager;
-//this.roleManager = roleManager;
+            this.roleManager = roleManager;
             this._claimsFactory = claimsFactory;
         }
 
@@ -46,7 +46,7 @@ namespace VacacionesTesisApp.Server.Controllers
         //}
 
 
-
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> Get()
         {
@@ -81,13 +81,32 @@ namespace VacacionesTesisApp.Server.Controllers
             return Ok(Usuarios);
         }
 
+        [HttpGet("rol/{nombre}")]
+        public async Task<ActionResult<IEnumerable<UsuarioModel>>> Get(string nombre) //Obtiene los usuarios de un rol especifico
+        {
+            nombre = nombre.Replace("_", " ");
+            var query = from user in context.Users
+                        join userRole in context.UserRoles on user.Id equals userRole.UserId
+                        join roleName in context.Roles on userRole.RoleId equals roleName.Id
+                        where roleName.Name.ToLower() == nombre.ToLower()
+                        select new UsuarioModel()
+                        {
+                            UserId = user.Id,
+                            Email = user.Email,
+                            Nombre = user.FullNameUser,
+                            Rol = roleName.Name
+                        };
 
+            List<UsuarioModel> Usuarios = await query.ToListAsync();
+
+            return Ok(Usuarios);
+        }
 
         [HttpGet("roles")]
         public async Task<ActionResult<List<RolModel>>> GetRoles()
         {
             return await context.Roles
-                .Select(x => new RolModel { Nombre = x.Name, RoleId = x.Id }).ToListAsync();
+                .Select(x => new RolModel { Nombre = x.Name, RoleId = x.Id }).OrderBy(x => x.Nombre).ToListAsync();
         }
 
 
@@ -95,7 +114,7 @@ namespace VacacionesTesisApp.Server.Controllers
         public async Task<ActionResult> GetRoles2()
         {
             var roles = await context.Roles
-                .Select(x => new RolModel { Nombre = x.Name, RoleId = x.Id }).ToListAsync();
+                .Select(x => new RolModel { Nombre = x.Name, RoleId = x.Id }).OrderBy(x => x.Nombre).ToListAsync();
             return Ok(roles);
         }
 
@@ -124,7 +143,8 @@ namespace VacacionesTesisApp.Server.Controllers
                 UserId = Response.Id,
                 Nombre = Response.FullNameUser,
                 Email = Response.Email,
-                Rol = rolName
+                Rol = rolName,
+                Habilitado = Response.IsEnabled
             };
 
             if (Response == null)
@@ -135,8 +155,30 @@ namespace VacacionesTesisApp.Server.Controllers
             return usuario;
         }
 
+/*
+        [HttpGet("validarAsesor/{email}")]
+        public async Task<ActionResult<UsuarioModel>> ValidarAsesor(string email)
+        {
+            var Consulta = from Usuario in context.Users
+                           join Role in context.UserRoles on Usuario.Id equals Role.UserId
+                           join RoleInfo in context.Roles on Role.RoleId equals RoleInfo.Id
+                           join Asesor in context.Asesor on Usuario.Email equals Asesor.CorreoPrincipal
+                           where Usuario.Email == email
+                           where RoleInfo.Name == "Asesor"
+                           select new UsuarioModel
+                           {
+                               UserId = Asesor.Id,
+                               Email = Usuario.Email,
+                               Nombre = Usuario.FullNameUser
+                           };
 
+            //Se usa una lista para evitar el error: 'Enumerator failed to MoveNextAsync.'
+            var usuario = await Consulta.ToListAsync();
 
+            if (usuario.Count <= 0) return NotFound();
+
+            return Ok(usuario.First());
+        }*/
 
         [HttpPost("asignarRol")]
         public async Task<ActionResult> AsignarRolUsuario(EditarRolModel editarRolModel)
@@ -153,6 +195,32 @@ namespace VacacionesTesisApp.Server.Controllers
             await userManager.RemoveFromRoleAsync(usuario, editarRolModel.RoleId);
             return NoContent();
         }
+
+
+        [HttpPost("RemplazarRol")]
+        public async Task<ActionResult> ReemplazarRolUsuario(EditarRolModel editarRolModel)
+        {
+            var usuario = await userManager.FindByIdAsync(editarRolModel.UserId);
+
+            var usersRoles = await context.UserRoles.ToListAsync();
+            var userRol = usersRoles.Find(x => x.UserId.Equals(editarRolModel.UserId));
+
+            if (userRol != null)
+            {
+                await userManager.RemoveFromRoleAsync(usuario, editarRolModel.RoleId);
+                await userManager.AddToRoleAsync(usuario, editarRolModel.RoleNuevoId);
+            }
+
+            if (editarRolModel.RoleId == "Sin Rol")
+            {
+                await userManager.AddToRoleAsync(usuario, editarRolModel.RoleNuevoId);
+            }
+
+            return NoContent();
+        }
+
+
+
 
 
         [HttpPost("crearRol")]
@@ -214,14 +282,5 @@ namespace VacacionesTesisApp.Server.Controllers
 
 
 
-        /*public class UsuariosController : Controller
-        {
-
-
-            public IActionResult Index()
-            {
-                return View();
-            }
-        }*/
     }
 }

@@ -68,7 +68,7 @@
 
 </div>
 
-<Modal @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
+<ModalVer @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
     <EditForm Model="@Solicitud">
         <DataAnnotationsValidator />
         <div class="row">
@@ -116,23 +116,25 @@
                         <select class="form-control" @bind="Solicitud.Estatus">
                             <option disabled>Seleccione</option>
 
-                            @foreach(var items in ListaEstados)
+                            @foreach (var items in ListaEstados)
                             {
                                 <option value="@items.Descripcion">@items.Descripcion</option>
                             }
                         </select>
-          @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
+                        @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
                     </div>
                 </div>
             </div>
         </div>
 
 
-            <a class="btn btn-success" @onclick="(() => Acciones())">Aprobar</a>
-
+            <div class="mb-2 pb-2">
+                <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonAprobar</button>
+                <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+            </div>
 
     </EditForm>
-</Modal>
+</ModalVer>
 
 <AuthorizeView>
     <Authorized>
@@ -152,7 +154,7 @@
 
 @code {
 
-    Modal Modal;
+    ModalVer Modal;
     bool editar = false;
     bool Ver = false;
     public Solicitud Solicitud { get; set; } = new Solicitud();
@@ -164,7 +166,9 @@
     string NombreUsuario;
     string RolUsuario;
     string NombreMostrar;
-
+    string ButtonGuardar = "Guardar";
+    string ButtonCancelar = "Cancelar";
+    string ButtonAprobar = "Aprobar";
     public class Estado
     {
         public string Id { get; set; }

@@ -105,7 +105,7 @@
 
 </div>
 
-<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
+<ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
     <EditForm Model="@SolicitudVacaciones">
         <DataAnnotationsValidator />
 <div class="row">
@@ -135,8 +135,8 @@
                                    placeholder="Descripción" />
                         </div>
                     </div>
+                  <ValidationMessage For="@(() => SolicitudVacaciones.Descripcion)" />
                 </div>
-
             </div>
 
             <div class="row">
@@ -166,18 +166,13 @@
                     </div>
                 </div>
             </div>
-
-            @if (editar == false)
-            {
-                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Crear</button>
-
-            }
-            else
-            {
-                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Editar</button>
-            }
+<div class="mb-2 pb-2">
+                    <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+                    <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+                </div>
+  
     </EditForm>
-</Modal>
+</ModalVer>
 
 <AuthorizeView>
     <Authorized>
@@ -196,7 +191,7 @@
 
 @code {
 
-    Modal Modal;
+    ModalVer Modal;
     bool editar = false;
     bool Ver = false;
     public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
@@ -204,13 +199,15 @@
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
 
+    string Titulo;
     string EmailUsuario;
     string IdCreador;
     string NombreUsuario;
     string RolUsuario;
     string NombreMostrar;
     int diasguardados;
-
+    string ButtonGuardar = "Guardar";
+    string ButtonCancelar = "Cancelar";
     bool UserCreado = false;
 
 
@@ -262,6 +259,7 @@
     {
         editar = false;
         Ver = false;
+        Titulo = "Crear solicitud de vacaciones";
         SolicitudVacaciones = new Solicitud();
         if (SolicitudVacaciones.Id == null)
         {
@@ -278,6 +276,7 @@
     void MostrarModalEditar(Solicitud solicitud)
     {
         editar = true;
+        Titulo = "Editar solicitud de vacaciones";
         Ver = false;
         SolicitudVacaciones = solicitud;
         Modal.Mostrar();
@@ -375,18 +374,22 @@
                     }
 
                     SolicitudVacaciones = new Solicitud();
+                    Modal.Ocultar();
                 }
                 else
                 {
-                    toast.ShowError("Error del sistema", "Exito");
+                   
                 }
                 Console.WriteLine("Editar");
-                Modal.Ocultar();
+
             }
         }
-
+        await actualizar();
 
     }
-
+    async Task actualizar()
+    {
+        ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+    }
 
     }
