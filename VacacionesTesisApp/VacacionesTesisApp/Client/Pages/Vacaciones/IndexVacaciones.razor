@@ -5,388 +5,455 @@
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
-<h3>Vacaciones</h3>
-<div>
-    <div class="row">
-        @if (UserCreado)
-        {
-            <div class="col-lg-9 col-md-9 col-sm-9 col-12">
-                <label></label>
-                <div>
-                    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+
+@if (ListaSolicitudesVacaciones == null)
+{
+    <Loader />
+}
+else if (ListaSolicitudesVacaciones.Count == 0)
+{
+    <h3>Vacaciones</h3>
+    <div>
+        <div class="row">
+            @if (UserCreado)
+            {
+                <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+                    <label></label>
+                    <div>
+                        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-3 col-12">
-                <label>Días disponibles:</label>
-                <div>
-                    <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-12">
+                    <label>Días disponibles:</label>
+                    <div>
+                        <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>
+                    </div>
                 </div>
-            </div>
 
 
-        }
-        else
-        {
-            <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
-                <div>
-                    <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
-                </div>
-            </div>
+            }
+            else
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+                    <div>
 
-        }
+                        <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+                    </div>
+                </div>
+
+            }
+        </div>
     </div>
-    </div>
+    <hr>
+    <text>Sin registros...</text>
 
+}
+else
+{
+         <h3>Vacaciones</h3>
 
-<hr>
-<div class="card">
-
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Fecha inicio</th>
-                    <th scope="col">Fecha Fin</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Estatus</th>
-                    <th scope="col">Dias a tomar</th>
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-
-                @if (ListaSolicitudesVacaciones == null)
+        <div>
+            <div class="row">
+                @if (UserCreado)
                 {
-                    <text>Cargando.....</text>
-                }
-                else if (ListaSolicitudesVacaciones.Count == 0)
-                {
-                    <text>Sin registros .....</text>
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+                        <label></label>
+                        <div>
+                            <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-12">
+                        <label>Días disponibles:</label>
+                        <div>
+                            <text class="form-control" style="background:#e9ecef"> @Empleado.DiasDisponibles </text>
+                        </div>
+                    </div>
+
+
                 }
                 else
                 {
-                    foreach (var elemento in ListaSolicitudesVacaciones)
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+                        <div>
+
+                            <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+
+
+        <hr>
+        <div class="card">
+
+            <div class="card-body" style="overflow-x:auto;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Fecha inicio</th>
+                            <th scope="col">Fecha Fin</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Estatus</th>
+                            <th scope="col">Dias a tomar</th>
+                            <th scope="col">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        @foreach (var elemento in ListaSolicitudesVacaciones)
+                        {
+                            <tr>
+
+
+                                <td>@elemento.Empleado.Nombre</td>
+                                <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                                <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                                <td>@elemento.Descripcion </td>
+                                <td>@elemento.Estatus</td>
+                                <td>@elemento.CantidadDias</td>
+
+                                @if (elemento.Estatus == "Generada")
+                                {
+                                    <td>
+                                        <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
+                                        <a style="color:#ffff;" class="oi oi-trash btn btn-danger" title="Eliminar" @onclick="(()=>Eliminar(elemento))"></a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                    </td>
+                                }
+
+
+
+
+                            </tr>
+
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        }
+
+        <ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
+            <EditForm Model="@SolicitudVacaciones">
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            <label>Fecha inicio: </label>
+                            <div>
+                                <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            <label>Fecha fin: </label>
+                            <div>
+                                <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaFin" placeholder="Fecha Fin" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            <label>Descripción: </label>
+                            <div>
+                                <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion"
+                                       placeholder="Descripción" />
+                            </div>
+                        </div>
+                        <ValidationMessage For="@(() => SolicitudVacaciones.Descripcion)" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            <label>Cantidad de dias: </label>
+                            @if (SolicitudVacaciones.FechaInicio != SolicitudVacaciones.FechaFin)
+                            {
+                                SolicitudVacaciones.CantidadDias = 1;
+                                cantidaddias = (SolicitudVacaciones.FechaFin - SolicitudVacaciones.FechaInicio).TotalDays;
+                                cantidaddias = cantidaddias + 1;
+                                SolicitudVacaciones.CantidadDias = SolicitudVacaciones.CantidadDias + Convert.ToInt32(cantidaddias);
+                            }
+                            else
+                            {
+                                SolicitudVacaciones.CantidadDias = 1;
+                            }
+                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.CantidadDias" disabled />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            <label>Estatus: </label>
+                            <div>
+                                <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Estatus" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-2 pb-2">
+                    <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+                    <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+                </div>
+
+            </EditForm>
+        </ModalVer>
+
+        <AuthorizeView>
+            <Authorized>
+                <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+                @if (context.User.Identity.Name != null)
+                {
+                    EmailUsuario = @context.User.Identity.Name;
+                    IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+                    NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+                    //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+
+                }
+
+            </Authorized>
+        </AuthorizeView>
+
+        @code {
+
+            ModalVer Modal;
+            bool editar = false;
+            bool Ver = false;
+    public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
+        public List<Solicitud> ListaSolicitudesVacaciones { get; set; }
+        public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+        public Empleado Empleado { get; set; } = new Empleado();
+
+        string Titulo;
+        string EmailUsuario;
+        string IdCreador;
+        string NombreUsuario;
+        string RolUsuario;
+        string NombreMostrar;
+        int diasguardados;
+        string ButtonGuardar = "Guardar";
+        string ButtonCancelar = "Cancelar";
+        bool UserCreado = false;
+
+
+        Double cantidaddias;
+
+        protected override async Task OnInitializedAsync()
+        {
+            //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+            try
+            {
+
+                ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
+
+                bool existe = ListaEmpleado.Any(x => x.NombreUsuario == NombreUsuario);
+                if (existe)
+                {
+
+                    UserCreado = true;
+                    Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
+                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+                }
+
+
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+        }
+
+        async Task OcultarModal()
+        {
+            if (editar == true)
+            {
+
+                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+                SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
+            }
+
+
+            SolicitudVacaciones = new Solicitud();
+            Modal.Ocultar();
+        }
+
+        void MostrarModal()
+        {
+            editar = false;
+            Ver = false;
+            Titulo = "Crear solicitud de vacaciones";
+            SolicitudVacaciones = new Solicitud();
+            if (SolicitudVacaciones.Id == null)
+            {
+
+                SolicitudVacaciones.Estatus = "Generada";
+                SolicitudVacaciones.FechaInicio = DateTime.Now;
+                SolicitudVacaciones.FechaFin = DateTime.Now;
+                Console.WriteLine(cantidaddias);
+            }
+            Modal.Mostrar();
+
+
+        }
+        void MostrarModalEditar(Solicitud solicitud)
+        {
+            editar = true;
+            Titulo = "Editar solicitud de vacaciones";
+            Ver = false;
+            SolicitudVacaciones = solicitud;
+            Modal.Mostrar();
+        }
+
+        async Task Acciones()
+        {
+
+            if (SolicitudVacaciones.Id == null)
+            {
+
+
+                if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+                {
+
+                    if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
                     {
-                <tr>
+                        toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
+                    }
 
-
-                    <td>@elemento.Empleado.Nombre</td>
-                    <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                    <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                    <td>@elemento.Descripcion </td>
-                    <td>@elemento.Estatus</td>
-                    <td>@elemento.CantidadDias</td>
-
-                    @if (elemento.Estatus == "Generada")
+                    if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
                     {
-                        <td>
-                            <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a>
-                        </td>
+
+                        toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles", "Advertencia");
+                    }
+                }
+                else
+                {
+                    SolicitudVacaciones.EmpleadoId = Empleado.Id;
+                    SolicitudVacaciones.Estatus = "Generada";
+                    SolicitudVacaciones.Tipo = "Vacaciones";
+                    var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
+                    string configuracion = respuestas.StatusCode.ToString();
+                    if (configuracion.Equals("OK"))
+                    {
+                        toast.ShowSuccess("Se creo correctamente", "Exito");
+                        Console.WriteLine("Exito");
+                        Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
+                        await http.PutAsJsonAsync("api/empleados", Empleado);
+                        ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+                        SolicitudVacaciones = new Solicitud();
+                        Modal.Ocultar();
                     }
                     else
                     {
-                        <td>
-                         
-                        </td>
                     }
 
-
-
-
-                </tr>
-
-                    }
                 }
 
-            </tbody>
-        </table>
-    </div>
 
-</div>
+            }
+            else
+            {
+                if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+                {
 
-<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
-    <EditForm Model="@SolicitudVacaciones">
-        <DataAnnotationsValidator />
-<div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha inicio: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaInicio" placeholder="Fecha inicio" disabled />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha fin: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="SolicitudVacaciones.FechaFin" placeholder="Fecha Fin" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <div class="form-group">
-                        <label>Descripción: </label>
-                        <div>
-                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Descripcion"
-                                   placeholder="Descripción" />
-                        </div>
-                    </div>
-                </div>
+                    if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
+                    {
+                        toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
+                    }
 
-            </div>
+                    if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
+                    {
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Cantidad de dias: </label>
-                        @if (SolicitudVacaciones.FechaInicio != SolicitudVacaciones.FechaFin)
+                        toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles", "Advertencia");
+                    }
+                }
+                else
+                {
+
+                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+
+                    var solicitudAnteriro = ListaSolicitudesVacaciones.Where(x => x.EmpleadoId == Empleado.Id && x.Id == SolicitudVacaciones.Id).FirstOrDefault();
+                    var cantidadguardad = solicitudAnteriro.CantidadDias;
+
+                    var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
+
+                    string configuracion = repuesta.StatusCode.ToString();
+                    if (configuracion.Equals("OK"))
+                    {
+                        toast.ShowSuccess("Se actualizo correctamente", "Exito");
+
+
+                        if (SolicitudVacaciones.CantidadDias == cantidadguardad)
                         {
-                            SolicitudVacaciones.CantidadDias = 1;
-                            cantidaddias = (SolicitudVacaciones.FechaFin - SolicitudVacaciones.FechaInicio).TotalDays;
-                            cantidaddias = cantidaddias + 1;
-                            SolicitudVacaciones.CantidadDias = SolicitudVacaciones.CantidadDias + Convert.ToInt32(cantidaddias);
+                            Empleado.DiasDisponibles = Empleado.DiasDisponibles;
                         }
                         else
                         {
-                            SolicitudVacaciones.CantidadDias = 1;
+                            Empleado.DiasDisponibles = Empleado.DiasDisponibles + cantidadguardad;
+                            Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
+
+                            await http.PutAsJsonAsync("api/empleados", Empleado);
+                            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
                         }
-                        <input class="form-control" type="text" @bind-value="SolicitudVacaciones.CantidadDias" disabled />
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Estatus: </label>
-                        <div>
-                            <input class="form-control" type="text" @bind-value="SolicitudVacaciones.Estatus" disabled />
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            @if (editar == false)
-            {
-                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Crear</button>
-
-            }
-            else
-            {
-                <button type="submit"  class="btn btn-success" @onclick="(() => Acciones())">Editar</button>
-            }
-    </EditForm>
-</Modal>
-
-<AuthorizeView>
-    <Authorized>
-        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
-        @if (context.User.Identity.Name != null)
-        {
-            EmailUsuario = @context.User.Identity.Name;
-            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
-            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
-            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
-
-        }
-
-    </Authorized>
-</AuthorizeView>
-
-@code {
-
-    Modal Modal;
-    bool editar = false;
-    bool Ver = false;
-    public Solicitud SolicitudVacaciones { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudesVacaciones { get; set; } = new List<Solicitud>();
-    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
-    public Empleado Empleado { get; set; } = new Empleado();
-
-    string EmailUsuario;
-    string IdCreador;
-    string NombreUsuario;
-    string RolUsuario;
-    string NombreMostrar;
-    int diasguardados;
-
-    bool UserCreado = false;
-
-
-    Double cantidaddias;
-
-    protected override async Task OnInitializedAsync()
-    {
-        //ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
-
-        try
-        {
-
-            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
-
-            bool existe = ListaEmpleado.Any(x => x.NombreUsuario == NombreUsuario);
-            if (existe)
-            {
-
-                UserCreado = true;
-                Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
-                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
-            }
-
-
-
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
-        }
-
-    }
-
-    async Task OcultarModal()
-    {
-        if (editar == true)
-        {
-
-            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
-            SolicitudVacaciones = ListaSolicitudesVacaciones.First(x => x.Id.Equals(SolicitudVacaciones.Id));
-        }
-
-
-        SolicitudVacaciones = new Solicitud();
-        Modal.Ocultar();
-    }
-
-    void MostrarModal()
-    {
-        editar = false;
-        Ver = false;
-        SolicitudVacaciones = new Solicitud();
-        if (SolicitudVacaciones.Id == null)
-        {
-
-            SolicitudVacaciones.Estatus = "Generada";
-            SolicitudVacaciones.FechaInicio = DateTime.Now;
-            SolicitudVacaciones.FechaFin = DateTime.Now;
-            Console.WriteLine(cantidaddias);
-        }
-        Modal.Mostrar();
-
-
-    }
-    void MostrarModalEditar(Solicitud solicitud)
-    {
-        editar = true;
-        Ver = false;
-        SolicitudVacaciones = solicitud;
-        Modal.Mostrar();
-    }
-
-    async Task Acciones()
-    {
-
-        if (SolicitudVacaciones.Id == null)
-        {
-
-
-            if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
-            {
-
-                if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
-                {
-                    toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
-                }
-
-                if(SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
-                {
-
-                    toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles","Advertencia");
-                }
-            }
-            else
-            {
-                SolicitudVacaciones.EmpleadoId = Empleado.Id;
-                SolicitudVacaciones.Estatus = "Generada";
-                SolicitudVacaciones.Tipo = "Vacaciones";
-                var respuestas = await http.PostAsJsonAsync("api/solicitud", SolicitudVacaciones);
-                string configuracion = respuestas.StatusCode.ToString();
-                if (configuracion.Equals("OK"))
-                {
-                    toast.ShowSuccess("Se creo correctamente", "Exito");
-                    Console.WriteLine("Exito");
-                    Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
-                    await http.PutAsJsonAsync("api/empleados", Empleado);
-                    ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
-                    SolicitudVacaciones = new Solicitud();
-                    Modal.Ocultar();
-                }
-                else
-                {
-                }
-
-            }
-
-
-        }
-        else
-        {
-            if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles || SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
-            {
-
-                if (SolicitudVacaciones.FechaFin.Date < SolicitudVacaciones.FechaInicio.Date)
-                {
-                    toast.ShowInfo("La fecha de fin no puede ser menor a la fecha de de inicio", "Advertencia");
-                }
-
-                if (SolicitudVacaciones.CantidadDias > Empleado.DiasDisponibles)
-                {
-
-                    toast.ShowInfo("Los dias solicitados no pueden ser mayores a los dias disponibles", "Advertencia");
-                }
-            }
-            else
-            {
-
-                ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
-
-                var solicitudAnteriro = ListaSolicitudesVacaciones.Where(x=>x.EmpleadoId==Empleado.Id && x.Id==SolicitudVacaciones.Id).FirstOrDefault();
-                var cantidadguardad = solicitudAnteriro.CantidadDias;
-
-                var repuesta = await http.PutAsJsonAsync("api/solicitud", SolicitudVacaciones);
-
-                string configuracion = repuesta.StatusCode.ToString();
-                if (configuracion.Equals("OK"))
-                {
-                    toast.ShowSuccess("Se actualizo correctamente", "Exito");
-
-
-                    if (SolicitudVacaciones.CantidadDias==cantidadguardad)
-                    {
-                        Empleado.DiasDisponibles = Empleado.DiasDisponibles;
+                        SolicitudVacaciones = new Solicitud();
+                        Modal.Ocultar();
                     }
                     else
                     {
-                        Empleado.DiasDisponibles = Empleado.DiasDisponibles + cantidadguardad;
-                        Empleado.DiasDisponibles = Empleado.DiasDisponibles - SolicitudVacaciones.CantidadDias;
 
-                        await http.PutAsJsonAsync("api/empleados", Empleado);
-                        ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
                     }
+                    Console.WriteLine("Editar");
 
-                    SolicitudVacaciones = new Solicitud();
                 }
-                else
-                {
-                    toast.ShowError("Error del sistema", "Exito");
-                }
-                Console.WriteLine("Editar");
-                Modal.Ocultar();
             }
+            await actualizar();
+
+        }
+        async Task actualizar()
+        {
+            ListaSolicitudesVacaciones = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudVacaciones/{Empleado.Id}");
+            Empleado = await http.GetFromJsonAsync<Empleado>($"api/Empleados/{Empleado.Id}");
+
         }
 
+        async Task Eliminar(Solicitud solicitud)
+        {
+            var result = await js.ConfirmCreateSinAlerta("Aviso", "¿Seguro que quiere eliminar la solicitud?", TipoMensajeSweetAler.warning);
+            if (result)
+            {
+                var empleado = await http.GetFromJsonAsync<Empleado>($"api/Empleados/{Empleado.Id}");
 
-    }
+                var respuesta = await http.DeleteAsync($"api/solicitud/{solicitud.Id}");
+                string configuracion = respuesta.StatusCode.ToString();
+
+                if (configuracion.Equals("OK"))
+                {
+                    toast.ShowSuccess("Se elimino correctamente", "Exito");
+                    empleado.DiasDisponibles = empleado.DiasDisponibles + solicitud.CantidadDias;
+                    await http.PutAsJsonAsync("api/empleados", empleado);
+                    await actualizar();
 
 
-    }
+                }
+            }
+
+        }
+
+        }

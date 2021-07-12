@@ -17,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Http;
 using VacacionesTesisApp.Shared.Models;
+using VacacionesTesisApp.Server.Data;
+using System.Globalization;
 
 namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 {
@@ -26,12 +28,14 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
+        private readonly ApplicationDbContext _context;
         private readonly IEmailSender _emailSender;
 
         //public static Dictionary<string, HttpClient> HttpClients { get; set; }
-      //  public HttpClient client = new HttpClient();
+        //  public HttpClient client = new HttpClient();
 
         public RegisterModel(
+            ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -41,12 +45,14 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
         public InputModel Input { get; set; }
 
         public string ReturnUrl { get; set; }
+        public bool error  { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
@@ -63,12 +69,12 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
             [Display(Name = "Correo")]
             public string Email { get; set; }
 
-            [Required]
-            [StringLength(100, ErrorMessage = "El {0} debe tener al menos {2} y un máximo de {1} caracteres.", MinimumLength = 6)]
+            [Required(ErrorMessage = "la contraseña es requerida")]
+            [StringLength(100, ErrorMessage = "La contraseña debe tener al menos {2} y un máximo de {1} caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Clave")]
             public string Password { get; set; }
 
+            [Required(ErrorMessage = "El correo es requerido")]
             [DataType(DataType.Password)]
             [Display(Name = "Confirmar Clave")]
             [Compare("Password", ErrorMessage = "La contraseña y la contraseña de confirmación no coinciden.")]
@@ -96,11 +102,14 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
 
-          
-          
-          /*  product = await GetProductAsync(url.PathAndQuery);
-            ShowProduct(product);*/
+
+
+            /*  product = await GetProductAsync(url.PathAndQuery);
+              ShowProduct(product);*/
             //returnUrl = returnUrl ?? Url.Content("/usuarios");
+            bool existe = _context.Users.Any(x => x.Email == Input.Email);
+            if (!existe)
+            {
 
             returnUrl = ("/usuarios"); 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -143,6 +152,21 @@ namespace VacacionesTesisApp.Server.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
+
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    error = true;
+                }
+
+
+
+                return Page();
+
+            }
         }
+
     }
 }

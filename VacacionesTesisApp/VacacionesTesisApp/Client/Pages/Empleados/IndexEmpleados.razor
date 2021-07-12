@@ -1,51 +1,63 @@
 ﻿@inject IJSRuntime js
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize(Roles = "Admin")]
 @attribute [Authorize]
 @inject NavigationManager navigation
 @inject HttpClient http
 @inject IToastService toast
 @page "/empleados"
-<h3>Empleados</h3>
-<div>
-    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
 
-</div>
-<hr>
-<div class="card">
 
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Cedula</th>
-                    <th scope="col">Fecha de Ingreso</th>
-                    <th scope="col">Dias disponible</th>
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
+@if (ListaEmpleado == null)
+{
+    <Loader />
+}
+else if (ListaEmpleado.Count == 0)
+{
+    <h3>Empleados</h3>
+    <div>
+        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
 
-                @if (ListaEmpleado == null)
-                {
-                    <text>Cargando.....</text>
-                }
-                else if (ListaEmpleado.Count == 0)
-                {
-                    <text>Sin registros .....</text>
-                }
-                else
-                {
-                    foreach (var elemento in ListaEmpleado)
+    </div>
+    <hr>
+    <text>Sin registro..</text>
+
+
+}
+else
+{
+
+    <h3>Empleados</h3>
+    <div>
+        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
+
+    </div>
+    <hr>
+    <div class="card">
+
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Cedula</th>
+                        <th scope="col">Fecha de Ingreso</th>
+                        <th scope="col">Dias disponible</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var elemento in ListaEmpleado)
                     {
                         <tr>
 
                             <td>@elemento.Nombre</td>
                             <td>@elemento.Apellido</td>
                             <td>@elemento.Cedula </td>
-                            <td>@elemento.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.FechaIngreso?.ToString("dd/MM/yyyy")</td>
                             <td>@elemento.DiasDisponibles</td>
                             <td>
                                 <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(()=>MostrarModalEditar(elemento))"></a> |
@@ -57,16 +69,18 @@
                         </tr>
 
                     }
-                }
 
-            </tbody>
-        </table>
+
+                </tbody>
+            </table>
+        </div>
+
     </div>
+}
 
-</div>
 
-<Modal @ref="Modal" Titulo="Crear nuevo empleado" onCancel="OcultarModal">
-    <EditForm Model="@Empleado">
+<ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
+    <EditForm Model="@Empleado" id="ModalCuenta" class="px-4">
         <DataAnnotationsValidator />
         @if (Ver == true)
         {
@@ -78,6 +92,7 @@
                             <input class="form-control" type="text" @bind-value="Empleado.Nombre" placeholder="Nombre" disabled />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.Nombre)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -87,6 +102,7 @@
                         </div>
                     </div>
                 </div>
+                <ValidationMessage For="@(() => Empleado.Apellido)" />
             </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -96,11 +112,20 @@
                             <input class="form-control" type="text" @bind-value="Empleado.Cedula" placeholder="Cedula" disabled />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.Cedula)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Cargo: </label>
-                        <input class="form-control" type="text" @bind-value="Empleado.Cargo.Descripcion" disabled />
+                        @if (Empleado.Cargo != null)
+                        {
+
+                            <input class="form-control" type="text" @bind-value="Empleado.Cargo.Descripcion" disabled />
+                        }
+                        else
+                        {
+                            <input class="form-control" type="text" @bind-value="@Sindato" disabled />
+                        }
                     </div>
                 </div>
             </div>
@@ -134,6 +159,7 @@
                         </div>
                     </div>
                 </div>
+                <ValidationMessage For="@(() => Empleado.Cedula)" />
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
                         <label>Usuario: </label>
@@ -151,6 +177,7 @@
                             <input class="form-control" type="text" @bind-value="Empleado.Nombre" placeholder="Nombre" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.Nombre)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -159,6 +186,7 @@
                             <input class="form-control" type="text" @bind-value="Empleado.Apellido" placeholder="Apellido" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.Apellido)" />
                 </div>
             </div>
             <div class="row">
@@ -169,6 +197,7 @@
                             <input class="form-control" type="text" @bind-value="Empleado.Cedula" placeholder="Cedula" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.Cedula)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -194,6 +223,7 @@
                             <input class="form-control" type="date" @bind-value="Empleado.FechaNacimiento" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.FechaNacimiento)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -202,6 +232,7 @@
                             <input class="form-control" type="date" @bind-value="Empleado.FechaIngreso" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.FechaIngreso)" />
                 </div>
             </div>
 
@@ -214,6 +245,7 @@
                             <input class="form-control" type="text" @bind-value="Empleado.DiasDisponibles" />
                         </div>
                     </div>
+                    <ValidationMessage For="@(() => Empleado.DiasDisponibles)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -232,21 +264,17 @@
             </div>
 
 
-            @if (editar == false)
-            {
-                <a class="btn btn-success" @onclick="(() => Acciones())">Crear</a>
+            <div class="mb-2 pb-2">
+                <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+                <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+            </div>
 
-            }
-            else
-            {
-                <a class="btn btn-success" @onclick="(() => Acciones())">Editar</a>
-            }
 
         }
 
     </EditForm>
 
-</Modal>
+</ModalVer>
 
 <AuthorizeView>
     <Authorized>
@@ -268,19 +296,24 @@
 
 
 @code {
-    Modal Modal;
+    ModalVer Modal;
     bool editar = false;
     bool Ver = false;
     public Empleado Empleado { get; set; } = new Empleado();
-    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+    public List<Empleado> ListaEmpleado { get; set; }
     public List<Cargo> ListaCargos { get; set; } = new List<Cargo>();
     public List<UsuarioModel> ListaUser { get; set; } = new List<UsuarioModel>();
     public List<RolModel> ListaRoles { get; set; } = new List<RolModel>();
 
+    string Titulo;
+    string Sindato = "Sin cargo asignado";
     string EmailUsuario;
     string IdCreador;
     string NombreUsuario = "";
     string RolUsuario;
+
+    string ButtonGuardar = "Guardar";
+    string ButtonCancelar = "Cancelar";
 
     protected override async Task OnInitializedAsync()
     {
@@ -324,6 +357,7 @@
     void MostrarModal()
     {
         editar = false;
+        Titulo = "Crear empleado";
         Ver = false;
         Empleado = new Empleado();
         Modal.Mostrar();
@@ -333,6 +367,7 @@
     void MostrarModalEditar(Empleado empleado)
     {
         editar = true;
+        Titulo = "Editar empleado";
         Ver = false;
         Empleado = empleado;
         Modal.Mostrar();
@@ -340,6 +375,7 @@
     void MostrarModalVer(Empleado empleado)
     {
         Ver = true;
+        Titulo = "Ver empleado";
         Empleado = empleado;
         Modal.Mostrar();
     }
@@ -357,18 +393,33 @@
         if (Empleado.Id == null)
         {
             var respuestas = await http.PostAsJsonAsync("api/empleados", Empleado);
-            ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
-            Console.WriteLine("Creado");
-            Empleado = new Empleado();
+
+            string configuracion = respuestas.StatusCode.ToString();
+
+            if (configuracion.Equals("OK"))
+            {
+                toast.ShowSuccess("Se creo correctamente", "Exito");
+                ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
+                Empleado = new Empleado();
+                Modal.Ocultar();
+            }
         }
         else
         {
             var repuesta = await http.PutAsJsonAsync("api/empleados", Empleado);
-
-            Console.WriteLine("Editar");
+            string configuracion = repuesta.StatusCode.ToString();
+            if (configuracion.Equals("OK"))
+            {
+                toast.ShowSuccess("Se actualizo correctamente", "Exito");
+                ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>($"api/empleados");
+                Empleado = new Empleado();
+                Modal.Ocultar();
+            }
         }
 
-        Modal.Ocultar();
     }
 
+
 }
+
+

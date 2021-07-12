@@ -7,7 +7,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <a  href="authentication/profile">
+        <a  href="Identity/Account/Manage/ChangePassword">
             Hola,
             @if (context.User.Claims.First(c => c.Type == "FullNameUser").Value == null ||
           context.User.Claims.First(c => c.Type == "FullNameUser").Value == "")

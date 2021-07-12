@@ -1,0 +1,28 @@
+﻿@switch (TipoBoton)
+{
+    case "guardar":
+        @String.Format("Guardar")
+        break;
+    case "agregar":
+        @String.Format("Agregar")
+        break;
+    case "cancelar":
+        @String.Format("Cancelar")
+        break;
+    case "atras":
+        <span class="oi oi-media-skip-backward"></span>
+        break;
+    case "siguiente":
+        <span class="oi oi-media-skip-forward"></span>
+        break;
+    case "primero":
+        <span class="oi oi-media-step-backward"></span>
+        break;
+    case "ultimo":
+        <span class="oi oi-media-step-forward"></span>
+        break;
+}
+
+@code {
+    [Parameter] public string TipoBoton { get; set; }
+}
