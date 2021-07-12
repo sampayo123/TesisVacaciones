@@ -1,38 +1,45 @@
 ﻿@page "/solicitudesaprobadas"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize(Roles = "Admin")]
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
-<h3>Solicitudes aprobadas</h3>
 
-<div class="card">
+@if (ListaSolicitudes == null)
+{
+    <Loader />
+}
+else if (ListaSolicitudes.Count == 0)
+{
+    <h3>Solicitudes aprobadas</h3>
+    <hr>
+    <text>Sin registros...</text>
+}
+else
+{
 
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Datos del empleado</th>
-                    <th scope="col">Fecha inicio</th>
-                    <th scope="col">Fecha Fin</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Datos de la solicitud</th>
-                    <th scope="col">Estatus</th>
-                </tr>
-            </thead>
-            <tbody>
 
-                @if (ListaSolicitudes == null)
-                {
-                    <text>Cargando...</text>
-                }
-                else if (ListaSolicitudes.Count == 0)
-                {
-                    <text>Sin registros...</text>
-                }
-                else
-                {
-                    foreach (var elemento in ListaSolicitudes)
+    <h3>Solicitudes aprobadas</h3>
+    <hr>
+    <div class="card">
+
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Datos del empleado</th>
+                        <th scope="col">Fecha inicio</th>
+                        <th scope="col">Fecha Fin</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Datos de la solicitud</th>
+                        <th scope="col">Estatus</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (var elemento in ListaSolicitudes)
                     {
                         <tr>
 
@@ -57,13 +64,15 @@
                         </tr>
 
                     }
-                }
 
-            </tbody>
-        </table>
+
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
-</div>
+}
 
 <AuthorizeView>
     <Authorized>
@@ -87,7 +96,7 @@
     bool editar = false;
     bool Ver = false;
     public Solicitud Solicitud { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudes { get; set; } = new List<Solicitud>();
+    public List<Solicitud> ListaSolicitudes { get; set; }
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
     string EmailUsuario;
@@ -110,7 +119,7 @@
         {
 
             ListaEstados = new List<Estado>()
-        {
+{
                 new Estado {Id="gen123",Descripcion= "Generada"},
                 new Estado {Id="gen123",Descripcion= "Aprobada"},
                 new Estado {Id="gen123",Descripcion= "Desaprobada"},

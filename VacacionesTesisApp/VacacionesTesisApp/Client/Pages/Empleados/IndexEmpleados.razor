@@ -1,44 +1,56 @@
 ﻿@inject IJSRuntime js
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize(Roles = "Admin")]
 @attribute [Authorize]
 @inject NavigationManager navigation
 @inject HttpClient http
 @inject IToastService toast
 @page "/empleados"
-<h3>Empleados</h3>
-<div>
-    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
 
-</div>
-<hr>
-<div class="card">
 
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Cedula</th>
-                    <th scope="col">Fecha de Ingreso</th>
-                    <th scope="col">Dias disponible</th>
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
+@if (ListaEmpleado == null)
+{
+    <Loader />
+}
+else if (ListaEmpleado.Count == 0)
+{
+    <h3>Empleados</h3>
+    <div>
+        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
 
-                @if (ListaEmpleado == null)
-                {
-                    <text>Cargando.....</text>
-                }
-                else if (ListaEmpleado.Count == 0)
-                {
-                    <text>Sin registros .....</text>
-                }
-                else
-                {
-                    foreach (var elemento in ListaEmpleado)
+    </div>
+    <hr>
+    <text>Sin registro..</text>
+
+
+}
+else
+{
+
+    <h3>Empleados</h3>
+    <div>
+        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo empleado</button>
+
+    </div>
+    <hr>
+    <div class="card">
+
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Cedula</th>
+                        <th scope="col">Fecha de Ingreso</th>
+                        <th scope="col">Dias disponible</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var elemento in ListaEmpleado)
                     {
                         <tr>
 
@@ -57,13 +69,15 @@
                         </tr>
 
                     }
-                }
 
-            </tbody>
-        </table>
+
+                </tbody>
+            </table>
+        </div>
+
     </div>
+}
 
-</div>
 
 <ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
     <EditForm Model="@Empleado" id="ModalCuenta" class="px-4">
@@ -112,7 +126,7 @@
                         {
                             <input class="form-control" type="text" @bind-value="@Sindato" disabled />
                         }
-                    </div> 
+                    </div>
                 </div>
             </div>
 
@@ -209,7 +223,7 @@
                             <input class="form-control" type="date" @bind-value="Empleado.FechaNacimiento" />
                         </div>
                     </div>
-                <ValidationMessage For="@(() => Empleado.FechaNacimiento)" />
+                    <ValidationMessage For="@(() => Empleado.FechaNacimiento)" />
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
@@ -218,7 +232,7 @@
                             <input class="form-control" type="date" @bind-value="Empleado.FechaIngreso" />
                         </div>
                     </div>
-                <ValidationMessage For="@(() => Empleado.FechaIngreso)" />
+                    <ValidationMessage For="@(() => Empleado.FechaIngreso)" />
                 </div>
             </div>
 
@@ -250,20 +264,11 @@
             </div>
 
 
-            @if (editar == false)
-            {
-                <div class="mb-2 pb-2">
-                    <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
-                    <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
-                </div>
+            <div class="mb-2 pb-2">
+                <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+                <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+            </div>
 
-            }
-            else
-            { <div class="mb-2 pb-2">
-                    <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
-                    <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
-                </div>
-            }
 
         }
 
@@ -295,13 +300,13 @@
     bool editar = false;
     bool Ver = false;
     public Empleado Empleado { get; set; } = new Empleado();
-    public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
+    public List<Empleado> ListaEmpleado { get; set; }
     public List<Cargo> ListaCargos { get; set; } = new List<Cargo>();
     public List<UsuarioModel> ListaUser { get; set; } = new List<UsuarioModel>();
     public List<RolModel> ListaRoles { get; set; } = new List<RolModel>();
 
     string Titulo;
-    string Sindato= "Sin cargo asignado";
+    string Sindato = "Sin cargo asignado";
     string EmailUsuario;
     string IdCreador;
     string NombreUsuario = "";
@@ -417,4 +422,4 @@
 
 }
 
-    
+

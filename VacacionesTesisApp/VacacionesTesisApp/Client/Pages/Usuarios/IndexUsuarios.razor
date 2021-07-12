@@ -5,37 +5,63 @@
 @inject NavigationManager navigationManager
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@*@attribute [Authorize(Roles = "Asesor, Admin")]*@
-@*@attribute [Authorize]*@
+@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize]
 
 
 
-<div class="form-row">
-    <div class="col-md-8 col-sm-6 mb-3" align="left">
-        <h3>Administrar Usuarios</h3>
-        <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
-    </div>
-    <div class="col-md-4 col-sm-6 mb-3" align="right">
-        <h5>
-            <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
-        </h5>
-    </div>
-</div>
 
-<hr />
 
-<div class="form-row">
-    <div class="col-md-10 mb-3" align="right">
-        <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar usuarios..." />
-    </div>
-</div>
-<br />
-
-@if (Lista.Count == 0)
+@if(Lista==null)
 {
+    <Loader/>
+}
+else if (Lista.Count == 0)
+{
+    <div class="form-row">
+        <div class="col-md-8 col-sm-6 mb-3" align="left">
+            <h3>Administrar Usuarios</h3>
+            <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+        </div>
+        <div class="col-md-4 col-sm-6 mb-3" align="right">
+            <h5>
+                <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+            </h5>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="form-row">
+        <div class="col-md-10 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar usuarios..." />
+        </div>
+    </div>
+    <br />
+
     <text>No hay registros.</text> }
 else
 {
+    <div class="form-row">
+        <div class="col-md-8 col-sm-6 mb-3" align="left">
+            <h3>Administrar Usuarios</h3>
+            <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+        </div>
+        <div class="col-md-4 col-sm-6 mb-3" align="right">
+            <h5>
+                <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+            </h5>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="form-row">
+        <div class="col-md-10 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar usuarios..." />
+        </div>
+    </div>
+    <br />
 
     <DataGrid TItem="UsuarioModel" Data="Lista" CustomFilter="@OnCustomFilter"
               ShowPager="true" PageSize="8" SelectedRowStyling="@OnSelectedRowStyling"
@@ -80,7 +106,7 @@ else
 
 
 @code
-{ public List<UsuarioModel> Lista = new List<UsuarioModel>();
+{ public List<UsuarioModel> Lista;
     private UsuarioModel usuarioMostrar = new UsuarioModel();
 
 

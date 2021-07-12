@@ -4,9 +4,9 @@
 @using VacacionesTesisApp.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@*@attribute [Authorize(Roles = "Admin")]*@
+@attribute [Authorize(Roles = "Admin")]
+@inject IToastService toast
 @attribute [Authorize]
-
 @*<h3>Editar rol de usuario</h3>
     <hr />*@
 
@@ -130,13 +130,15 @@
 
         if (httpResponse.Equals("Conflict"))
         {
-            await js.MostrarMensaje("Error"
-                    , "Se presentó un error, notificar a sistemas", TipoMensajeSweetAler.error);
+            toast.ShowError("Se presentó un error, notificar a sistemas", "Error");
+            @*await js.MostrarMensaje("Error"
+                , "Se presentó un error, notificar a sistemas", TipoMensajeSweetAler.error);*@
 
         }
         else
         {
-            await js.MostrarMensaje("Operación realizada", "Se asigno el Rol", TipoMensajeSweetAler.success);
+            toast.ShowSuccess("Operación realizada", "Exito");
+            //await js.MostrarMensaje("Operación realizada", "Se asigno el Rol", TipoMensajeSweetAler.success);
             await OnInitializedAsync();
         }
 

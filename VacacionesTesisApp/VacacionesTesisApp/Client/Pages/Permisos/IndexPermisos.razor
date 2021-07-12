@@ -5,6 +5,44 @@
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
+
+@if (ListaSolicitudPermisos == null)
+{
+    <Loader />
+}
+else if (ListaSolicitudPermisos.Count == 0)
+{
+    <h3>Permisos</h3>
+    <div>
+        <div class="row">
+            @if (UserCreado)
+            {
+                <div class="col-lg-9 col-md-9 col-sm-9 col-12">
+                    <label></label>
+                    <div>
+                        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+                    <div>
+                        <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <hr>
+    <text>Sin registros...</text>
+}
+else
+{
+
+
 <h3>Permisos</h3>
 <div>
     <div class="row">
@@ -47,51 +85,37 @@
             </thead>
             <tbody>
 
-                @if (ListaSolicitudPermisos == null)
+                @foreach (var elemento in ListaSolicitudPermisos)
                 {
-                    <text>Cargando.....</text>
+                    <tr>
+                        <td>@elemento.Empleado.Nombre</td>
+                        <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                        <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                        <td>@elemento.Descripcion </td>
+                        <td>@elemento.Estatus</td>
+                        <td>@elemento.CantidadDias</td>
+
+                        @if (elemento.Estatus == "Generada")
+                        {
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(() => MostrarModalEditar(elemento))"></a>
+                                <a style="color:#ffff;" class="oi oi-trash btn btn-danger" title="Eliminar" @onclick="(()=>Eliminar(elemento))"></a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                            </td>
+                        }
+                    </tr>
                 }
-                else if (ListaSolicitudPermisos.Count == 0)
-                {
-                    <text>Sin registros .....</text>
-                }
-                else
-                {
-                    foreach (var elemento in ListaSolicitudPermisos)
-                    {
-                <tr>
-
-
-                    <td>@elemento.Empleado.Nombre</td>
-                    <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                    <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                    <td>@elemento.Descripcion </td>
-                    <td>@elemento.Estatus</td>
-                    <td>@elemento.CantidadDias</td>
-
-                    @if (elemento.Estatus == "Generada")
-                    {
-                        <td>
-                            <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(() => MostrarModalEditar(elemento))"></a>
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                         
-                        </td>
-                    }
-
-                </tr>
-
-                    }
-                }
-
             </tbody>
         </table>
     </div>
 
 </div>
+
+}
 
 <ModalVer @ref="Modal" Titulo="@Titulo" onCancel="OcultarModal">
     <EditForm Model="@SolicitudPermisos">
@@ -183,7 +207,7 @@
     bool editar = false;
     bool Ver = false;
     public Solicitud SolicitudPermisos { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudPermisos { get; set; } = new List<Solicitud>();
+    public List<Solicitud> ListaSolicitudPermisos { get; set; }
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
 
@@ -318,8 +342,23 @@
 
         }
 
+    }
+    async Task Eliminar(Solicitud solicitud)
+    {
+        var result = await js.ConfirmCreateSinAlerta("Aviso", "¿Seguro que quiere eliminar la solicitud?", TipoMensajeSweetAler.warning);
+        if (result)
+        {
+            var respuesta = await http.DeleteAsync($"api/solicitud/{solicitud.Id}");
+            string configuracion = respuesta.StatusCode.ToString();
+
+            if (configuracion.Equals("OK"))
+            {
+                toast.ShowSuccess("Se elimino correctamente", "Exito");
+                ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+
+            }
+        }
 
     }
-
 
 }

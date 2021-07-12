@@ -9,10 +9,10 @@ namespace VacacionesTesisApp.Shared.Models
     public class Empleado
     {
         public string Id { get; set; }
-        [RegularExpression(@"^[a-z+A-Z]+['\s]*$", ErrorMessage = "Este campo solo admite letras")]
+        [RegularExpression(@"^[a-z+A-Z ]+['\s]*$", ErrorMessage = "Este campo solo admite letras")]
         [Required(ErrorMessage = "Este campo es requerido")]
         public string Nombre { get; set; }
-        [RegularExpression(@"^[a-z+A-Z]+['\s]*$", ErrorMessage = "Este campo solo admite letras")]
+        [RegularExpression(@"^[a-z+A-Z ]+['\s]*$", ErrorMessage = "Este campo solo admite letras")]
         [Required(ErrorMessage = "Este campo es requerido")]
         public string Apellido { get; set; }
         [RegularExpression("(^[0-9]+$)", ErrorMessage = "Este campo solo admite números")]

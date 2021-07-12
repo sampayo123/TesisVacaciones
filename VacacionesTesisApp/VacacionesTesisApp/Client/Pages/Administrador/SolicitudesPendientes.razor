@@ -1,131 +1,149 @@
 ﻿@page "/solicitudespendientes"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize(Roles = "Admin")]
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
-<h3>Solicitudes pendientes por aprobar</h3>
-
-<div class="card">
-
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Datos del empleado</th>
-                    <th scope="col">Fecha inicio</th>
-                    <th scope="col">Fecha Fin</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Datos de la solicitud</th>
 
 
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
+@if (ListaSolicitudes == null)
+{
+    <Loader/>
+}
+else if (ListaSolicitudes.Count == 0)
+{
+    <h3>Solicitudes pendientes por aprobar</h3>
+    <hr>
+    <text>Sin registros...</text>
+}
+else
+{
 
-                @if (ListaSolicitudes == null)
-                {
-                    <text>Cargando...</text>
-                }
-                else if (ListaSolicitudes.Count == 0)
-                {
-                    <text>Sin registros...</text>
-                }
-                else
-                {
-                    foreach (var elemento in ListaSolicitudes)
+    <h3>Solicitudes pendientes por aprobar</h3>
+    <hr>
+    <div class="card">
+
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Datos del empleado</th>
+                        <th scope="col">Fecha inicio</th>
+                        <th scope="col">Fecha Fin</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Datos de la solicitud</th>
+
+
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var elemento in ListaSolicitudes)
                     {
-                <tr>
+                        <tr>
 
-                    <td>
-                        <div class="col-12"><strong> @String.Format("Nombre:")</strong>@elemento.Empleado.Nombre</div>
-                        <div class="col-12"><strong> @String.Format("Apellido:")</strong>@elemento.Empleado.Apellido</div>
-                        <div class="col-12"> <strong>@String.Format("Cédula: ")</strong>@elemento.Empleado.Cedula</div>
-                    </td>
-                    <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                    <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                    <td>@elemento.Descripcion </td>
+                            <td>
+                                <div class="col-12"><strong> @String.Format("Nombre:")</strong>@elemento.Empleado.Nombre</div>
+                                <div class="col-12"><strong> @String.Format("Apellido:")</strong>@elemento.Empleado.Apellido</div>
+                                <div class="col-12"> <strong>@String.Format("Cédula: ")</strong>@elemento.Empleado.Cedula</div>
+                            </td>
+                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
+                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
+                            <td>@elemento.Descripcion </td>
 
-                    <td>
-                        <div class="col-12"><strong> @String.Format("Estatus:")</strong>@elemento.Estatus</div>
-                        <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@elemento.CantidadDias</div>
-                        <div class="col-12"> <strong>@String.Format("Tipo: ")</strong>@elemento.Tipo</div>
-                    </td>
-                    <td>
-                        <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Cambiar estatus" @onclick="(()=>Aprobar(elemento))"></a>
-                    </td>
+                            <td>
+                                <div class="col-12"><strong> @String.Format("Estatus:")</strong>@elemento.Estatus</div>
+                                <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@elemento.CantidadDias</div>
+                                <div class="col-12"> <strong>@String.Format("Tipo: ")</strong>@elemento.Tipo</div>
+                            </td>
+                            <td>
+                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Cambiar estatus" @onclick="(() => Aprobar(elemento))"></a>
+                            </td>
 
 
-                </tr>
+                        </tr>
 
                     }
-                }
 
-            </tbody>
-        </table>
+
+                   
+                        <StringEnBotones TipoBoton="atras" />
+                    
+               
+                        <StringEnBotones TipoBoton="siguiente" />
+                
+                
+                        <StringEnBotones TipoBoton="primero" />
+                 
+               
+                        <StringEnBotones TipoBoton="ultimo" />
+                
+                </tbody>
+            </table>
+        </div>
+
     </div>
-
-</div>
-
-<ModalVer @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
-    <EditForm Model="@Solicitud">
-        <DataAnnotationsValidator />
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Fecha inicio: </label>
-                    <div>
-                        <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
+}
+    <ModalVer @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
+        <EditForm Model="@Solicitud">
+            <DataAnnotationsValidator />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha inicio: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Fecha fin: </label>
+                        <div>
+                            <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Fecha fin: </label>
-                    <div>
-                        <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        <label>Descripción: </label>
+                        <div>
+                            <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
+                                   placeholder="Descripción" disabled />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Cantidad de dias: </label>
+                        <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label>Estatus: </label>
+                        <div>
+                            <select class="form-control" @bind="Solicitud.Estatus">
+                                <option disabled>Seleccione</option>
+
+                                @foreach (var items in ListaEstados)
+                                {
+                                    <option value="@items.Descripcion">@items.Descripcion</option>
+                                }
+                            </select>
+                            @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 mb-3">
-                <div class="form-group">
-                    <label>Descripción: </label>
-                    <div>
-                        <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
-                               placeholder="Descripción" disabled />
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Cantidad de dias: </label>
-                    <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="form-group">
-                    <label>Estatus: </label>
-                    <div>
-                        <select class="form-control" @bind="Solicitud.Estatus">
-                            <option disabled>Seleccione</option>
-
-                            @foreach (var items in ListaEstados)
-                            {
-                                <option value="@items.Descripcion">@items.Descripcion</option>
-                            }
-                        </select>
-                        @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
             <div class="mb-2 pb-2">
@@ -133,32 +151,32 @@
                 <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
             </div>
 
-    </EditForm>
-</ModalVer>
+        </EditForm>
+    </ModalVer>
 
-<AuthorizeView>
-    <Authorized>
-        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
-        @if (context.User.Identity.Name != null)
-        {
-            EmailUsuario = @context.User.Identity.Name;
-            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
-            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
-            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+    <AuthorizeView>
+        <Authorized>
+            <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+            @if (context.User.Identity.Name != null)
+            {
+                EmailUsuario = @context.User.Identity.Name;
+                IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+                NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+                //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
-        }
+            }
 
-    </Authorized>
-</AuthorizeView>
+        </Authorized>
+    </AuthorizeView>
 
 
-@code {
+    @code {
 
-    ModalVer Modal;
-    bool editar = false;
-    bool Ver = false;
-    public Solicitud Solicitud { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudes { get; set; } = new List<Solicitud>();
+        ModalVer Modal;
+        bool editar = false;
+        bool Ver = false;
+public Solicitud Solicitud { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudes { get; set; }
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
     string EmailUsuario;
@@ -183,7 +201,7 @@
         {
 
             ListaEstados = new List<Estado>()
-            {
+{
                 new Estado {Id="gen123",Descripcion= "Generada"},
                 new Estado {Id="gen123",Descripcion= "Aprobada"},
                 new Estado {Id="gen123",Descripcion= "Desaprobada"},
@@ -257,4 +275,4 @@
 
 
 
-}
+    }
