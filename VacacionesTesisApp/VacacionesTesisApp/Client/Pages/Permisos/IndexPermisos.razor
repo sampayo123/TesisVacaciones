@@ -5,115 +5,164 @@
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
-
-@if (ListaSolicitudPermisos == null)
+@using Blazorise.DataGrid
+@if (ListaSolicitudPermisosObtener == null)
 {
-    <Loader />
+    @if (NoExiste == "")
+    {
+        <Loader />
+    }
+    else if (NoExiste == "Noexiste")
+    {
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+            <div>
+                <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+            </div>
+        </div>
+    }
 }
-else if (ListaSolicitudPermisos.Count == 0)
+else if (ListaSolicitudPermisosObtener.Count == 0)
 {
-    <h3>Permisos</h3>
-    <div>
-        <div class="row">
-            @if (UserCreado)
-            {
-                <div class="col-lg-9 col-md-9 col-sm-9 col-12">
-                    <label></label>
-                    <div>
-                        <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
-                    <div>
-                        <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
-                    </div>
-                </div>
-            }
+
+    @if (UserCreado)
+    {
+        <nav class="navbar navbar-light bg-light">
+            <div class="col-md-6  mr-0 pl-0">
+                <h5>
+                    <span class="oi oi-briefcase" aria-hidden="true"></span>
+                    &nbsp;Permisos
+                </h5>
+            </div>
+            <div class="col-md-6" align="right">
+                <h5>
+                    <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+                </h5>
+            </div>
+
+        </nav>
+    }
+    else
+    {
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+            <div>
+
+                <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+            </div>
+        </div>
+
+    }
+    <br />
+    <div class="form-row">
+        <div class="col-md-9 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar nombre..." />
+        </div>
+        <div class="col-md-3 mb-3" align="right">
+            <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
         </div>
     </div>
-
-
     <hr>
     <text>Sin registros...</text>
 }
 else
 {
 
-
-<h3>Permisos</h3>
-<div>
-    <div class="row">
-        @if (UserCreado)
-        {
-            <div class="col-lg-9 col-md-9 col-sm-9 col-12">
-                <label></label>
-                <div>
-                    <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
-                </div>
+    @if (UserCreado)
+    {
+        <nav class="navbar navbar-light bg-light">
+            <div class="col-md-6  mr-0 pl-0">
+                <h5>
+                    <span class="oi oi-briefcase" aria-hidden="true"></span>
+                    &nbsp;Permisos
+                </h5>
             </div>
-        }
-        else
-        {
-            <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
-                <div>
-                    <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
-                </div>
+            <div class="col-md-6" align="right">
+                <h5>
+                    <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+                </h5>
             </div>
-        }
-    </div>
-</div>
 
+        </nav>
+    }
+    else
+    {
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12" align="center">
+            <div>
 
-<hr>
-<div class="card">
+                <h5>El personal de gestión humana debe asignar un empleado a este usuario</h5>
+            </div>
+        </div>
 
-    <div class="card-body" style="overflow-x:auto;">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Fecha inicio</th>
-                    <th scope="col">Fecha Fin</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Estatus</th>
-                    <th scope="col">Dias a tomar</th>
-                    <th scope="col">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
+    }
+    <br />
 
-                @foreach (var elemento in ListaSolicitudPermisos)
-                {
-                    <tr>
-                        <td>@elemento.Empleado.Nombre</td>
-                        <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                        <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                        <td>@elemento.Descripcion </td>
-                        <td>@elemento.Estatus</td>
-                        <td>@elemento.CantidadDias</td>
-
-                        @if (elemento.Estatus == "Generada")
-                        {
-                            <td>
-                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Editar" @onclick="(() => MostrarModalEditar(elemento))"></a>
-                                <a style="color:#ffff;" class="oi oi-trash btn btn-danger" title="Eliminar" @onclick="(()=>Eliminar(elemento))"></a>
-                            </td>
-                        }
-                        else
-                        {
-                            <td>
-                            </td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="form-row">
+        <div class="col-md-9 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar nombre..." />
+        </div>
+        <div class="col-md-3 mb-3" align="right">
+            <button type="button" class="btn btn-info" style="background-color:#738b95 !important" @onclick="MostrarModal">Crear nuevo solicitud</button>
+        </div>
     </div>
 
-</div>
+
+    <hr>
+    <DataGrid TItem="Solicitud" Data="ListaSolicitudPermisos" CustomFilter="@OnCustomFilter"
+              ShowPager="true" PageSize="5" SelectedRowStyling="@OnSelectedRowStyling"
+              Striped="true" Responsive="true" Editable="true">
+
+
+        <ChildContent>
+
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.EmpleadoNombre)"
+                            Caption="Nombre"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.FechaInicio)"
+                            Caption="Fecha inicio"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.FechaFin)"
+                            Caption="Descripción"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.Estatus)"
+                            Caption="Estatus"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)"
+                            Caption="Dias a tomar"></DataGridColumn>
+
+
+
+            <DataGridCommandColumn TItem="Solicitud" Caption="Acciones">
+                <DeleteCommandTemplate>
+
+                </DeleteCommandTemplate>
+                <EditCommandTemplate>
+
+                    @if (context.Item.Estatus == "Generada")
+                    {
+                        <Button style="color:#ffff;" class="oi oi-pencil btn btn-success"
+                                @onclick="@(() => MostrarModalEditar(context.Item))" />
+                        <Button style="color:#ffff;" class="oi oi-trash btn btn-danger" title="Eliminar" @onclick="(() => Eliminar(context.Item))" />
+                    }
+                </EditCommandTemplate>
+                <NewCommandTemplate></NewCommandTemplate>
+            </DataGridCommandColumn>
+        </ChildContent>
+
+
+
+
+
+        <PreviousPageButtonTemplate>
+            <StringEnBotones TipoBoton="atras" />
+        </PreviousPageButtonTemplate>
+        <NextPageButtonTemplate>
+            <StringEnBotones TipoBoton="siguiente" />
+        </NextPageButtonTemplate>
+        <FirstPageButtonTemplate>
+            <StringEnBotones TipoBoton="primero" />
+        </FirstPageButtonTemplate>
+        <LastPageButtonTemplate>
+            <StringEnBotones TipoBoton="ultimo" />
+        </LastPageButtonTemplate>
+
+
+
+    </DataGrid>
 
 }
 
@@ -207,10 +256,11 @@ else
     bool editar = false;
     bool Ver = false;
     public Solicitud SolicitudPermisos { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudPermisos { get; set; }
+    public List<Solicitud> ListaSolicitudPermisos { get; set; } = new List<Solicitud>();
+    public List<Solicitud> ListaSolicitudPermisosObtener { get; set; }
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
-
+    string NoExiste = "";
     string Titulo;
     string EmailUsuario;
     string IdCreador;
@@ -221,12 +271,14 @@ else
     Double cantidaddias;
     string ButtonGuardar = "Guardar";
     string ButtonCancelar = "Cancelar";
-
+    private string dateInputValue;
+    string customFilterValue;
     protected override async Task OnInitializedAsync()
     {
 
         try
         {
+            dateInputValue = DateTime.Now.ToString("dd/MM/yyyy");
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
 
             ListaEmpleado = await http.GetFromJsonAsync<List<Empleado>>("api/empleados");
@@ -236,7 +288,20 @@ else
             {
                 UserCreado = true;
                 Empleado = ListaEmpleado.First(x => x.NombreUsuario == NombreUsuario);
-                ListaSolicitudPermisos = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+
+                ListaSolicitudPermisos = new List<Solicitud>();
+                ListaSolicitudPermisosObtener = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/SolicitudPermiso/{Empleado.Id}");
+                ListaSolicitudPermisosObtener.ForEach(items =>
+                {
+
+                    items.EmpleadoNombre = items.Empleado.Nombre;
+                    ListaSolicitudPermisos.Add(items);
+
+                });
+            }
+            else
+            {
+                NoExiste = "Noexiste";
             }
 
 
@@ -260,6 +325,7 @@ else
 
         SolicitudPermisos = new Solicitud();
         Modal.Ocultar();
+        await OnInitializedAsync();
     }
 
     void MostrarModal()
@@ -341,7 +407,7 @@ else
 
 
         }
-
+        await OnInitializedAsync();
     }
     async Task Eliminar(Solicitud solicitud)
     {
@@ -358,7 +424,23 @@ else
 
             }
         }
+        await OnInitializedAsync();
+    }
 
+
+    bool OnCustomFilter(Solicitud model)
+    {
+        if (string.IsNullOrEmpty(customFilterValue))
+            return true;
+
+        return
+            model.Estatus?.Contains(customFilterValue, StringComparison.OrdinalIgnoreCase) == true
+            || model.Empleado.Nombre?.Contains(customFilterValue, StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    void OnSelectedRowStyling(Solicitud solicitud, DataGridRowStyling styling)
+    {
+        styling.Background = Background.Info;
     }
 
 }
