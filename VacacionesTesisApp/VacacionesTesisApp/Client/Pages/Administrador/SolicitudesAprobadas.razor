@@ -6,11 +6,11 @@
 @inject HttpClient http
 @inject IToastService toast
 @using Blazorise.DataGrid
-@if (ListaSolicitudes == null)
+@if (ListaSolicitudesObtener == null)
 {
     <Loader />
 }
-else if (ListaSolicitudes.Count == 0)
+else if (ListaSolicitudesObtener.Count == 0)
 {
     <nav class="navbar navbar-light bg-light">
         <div class="col-md-6">
@@ -67,11 +67,6 @@ else
 
 
         <ChildContent>
-
-
-            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)"
-                            Caption="d"></DataGridColumn>
-
             <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)" Caption="Datos del empleado">
                 <DisplayTemplate>
 
@@ -86,10 +81,10 @@ else
                             Caption="Fecha Inicio"></DataGridColumn>
             <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.FechaFin)"
                             Caption="Fecha fin"></DataGridColumn>
-            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.FechaFin)"
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.Descripcion)"
                             Caption="Descripción"></DataGridColumn>
 
-            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)" Caption="Datos del empleado">
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)" Caption="Datos del solicitud">
                 <DisplayTemplate>
 
                     <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@context.CantidadDias</div>
@@ -145,6 +140,7 @@ else
     bool editar = false;
     bool Ver = false;
     public Solicitud SolicitudDom { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudesObtener { get; set; }
     public List<Solicitud> ListaSolicitudes { get; set; } = new List<Solicitud>();
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
@@ -178,8 +174,9 @@ else
         };
 
 
-            var ListaObtenida = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/aprobadas");
-            ListaObtenida.ForEach(items =>
+            ListaSolicitudes = new List<Solicitud>();
+            ListaSolicitudesObtener = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/aprobadas");
+            ListaSolicitudesObtener.ForEach(items =>
             {
                 items.EmpleadoNombre = items.Empleado.Nombre;
                 items.EmpleadoApellido = items.Empleado.Apellido;

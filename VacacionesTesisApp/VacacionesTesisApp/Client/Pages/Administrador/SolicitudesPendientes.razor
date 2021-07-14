@@ -5,178 +5,222 @@
 @attribute [Authorize]
 @inject HttpClient http
 @inject IToastService toast
+@using Blazorise.DataGrid
 
-
-@if (ListaSolicitudes == null)
+@if (ListaSolicitudesObtener == null)
 {
-    <Loader/>
+    <Loader />
 }
-else if (ListaSolicitudes.Count == 0)
+else if (ListaSolicitudesObtener.Count == 0)
 {
-    <h3>Solicitudes pendientes por aprobar</h3>
-    <hr>
+    <nav class="navbar navbar-light bg-light">
+        <div class="col-md-6">
+            <h5>
+                <span class="oi oi-briefcase" aria-hidden="true"></span>
+                &nbsp;Solicitudes pendientes por aprobar
+            </h5>
+        </div>
+        <div class="col-md-6" align="right">
+            <h5>
+                <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+            </h5>
+        </div>
+    </nav>
+    <br />
+
+    <div class="form-row">
+        <div class="col-md-10 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar nombre..." />
+        </div>
+    </div>
+    <br />
+    <hr />
     <text>Sin registros...</text>
 }
 else
 {
 
-    <h3>Solicitudes pendientes por aprobar</h3>
-    <hr>
-    <div class="card">
+    <nav class="navbar navbar-light bg-light">
+        <div class="col-md-6">
+            <h5>
+                <span class="oi oi-briefcase" aria-hidden="true"></span>
+                &nbsp;Solicitudes pendientes por aprobar
+            </h5>
+        </div>
+        <div class="col-md-6" align="right">
+            <h5>
+                <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+            </h5>
+        </div>
+    </nav>
+    <br />
 
-        <div class="card-body" style="overflow-x:auto;">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Datos del empleado</th>
-                        <th scope="col">Fecha inicio</th>
-                        <th scope="col">Fecha Fin</th>
-                        <th scope="col">Descripción</th>
-                        <th scope="col">Datos de la solicitud</th>
-
-
-                        <th scope="col">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var elemento in ListaSolicitudes)
-                    {
-                        <tr>
-
-                            <td>
-                                <div class="col-12"><strong> @String.Format("Nombre:")</strong>@elemento.Empleado.Nombre</div>
-                                <div class="col-12"><strong> @String.Format("Apellido:")</strong>@elemento.Empleado.Apellido</div>
-                                <div class="col-12"> <strong>@String.Format("Cédula: ")</strong>@elemento.Empleado.Cedula</div>
-                            </td>
-                            <td>@elemento.FechaInicio.ToString("dd/MM/yyyy") </td>
-                            <td>@elemento.FechaFin.ToString("dd/MM/yyyy")</td>
-                            <td>@elemento.Descripcion </td>
-
-                            <td>
-                                <div class="col-12"><strong> @String.Format("Estatus:")</strong>@elemento.Estatus</div>
-                                <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@elemento.CantidadDias</div>
-                                <div class="col-12"> <strong>@String.Format("Tipo: ")</strong>@elemento.Tipo</div>
-                            </td>
-                            <td>
-                                <a style="color:#ffff;" class="oi oi-pencil btn btn-success" title="Cambiar estatus" @onclick="(() => Aprobar(elemento))"></a>
-                            </td>
+    <div class="form-row">
+        <div class="col-md-10 mb-3" align="right">
+            <TextEdit @bind-Text="@customFilterValue" Placeholder="Buscar nombre..." />
+        </div>
+    </div>
+    <br />
 
 
-                        </tr>
+    <DataGrid TItem="Solicitud" Data="ListaSolicitudes" CustomFilter="@OnCustomFilter"
+              ShowPager="true" PageSize="5" SelectedRowStyling="@OnSelectedRowStyling"
+              Striped="true" Responsive="true" Editable="true">
 
-                    }
+
+        <ChildContent>
+
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)" Caption="Datos del empleado">
+                <DisplayTemplate>
+
+                    <div class="col-12"><strong> @String.Format("Nombre:")</strong>@context.EmpleadoNombre</div>
+                    <div class="col-12"><strong> @String.Format("Apellido:")</strong>@context.EmpleadoApellido</div>
+                    <div class="col-12"> <strong>@String.Format("Cédula: ")</strong>@context.EmpleadoCedula</div>
+
+                </DisplayTemplate>
+            </DataGridColumn>
+
+            <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.FechaInicio)"
+                            Caption="Fecha Inicio"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" DisplayFormat="{0:dd/MM/yyyy}" Field="@nameof(Solicitud.FechaFin)"
+                            Caption="Fecha fin"></DataGridColumn>
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.Descripcion)"
+                            Caption="Descripción"></DataGridColumn>
+
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.CantidadDias)" Caption="Datos del solicitud">
+                <DisplayTemplate>
+
+                    <div class="col-12"><strong> @String.Format("Dias a tomar:")</strong>@context.CantidadDias</div>
+                    <div class="col-12"> <strong>@String.Format("Tipo: ")</strong>@context.Tipo</div>
+
+                </DisplayTemplate>
+            </DataGridColumn>
+            <DataGridColumn TItem="Solicitud" Field="@nameof(Solicitud.Estatus)"
+                            Caption="Estatus"></DataGridColumn>
+
+            <DataGridCommandColumn TItem="Solicitud" Caption="Acciones">
+                <DeleteCommandTemplate>
+
+                </DeleteCommandTemplate>
+                <EditCommandTemplate>
+
+                        <Button style="color:#ffff;" class="oi oi-pencil btn btn-success"
+                                @onclick="@(() => Aprobar(context.Item))" />
+      
+                </EditCommandTemplate>
+                <NewCommandTemplate></NewCommandTemplate>
+            </DataGridCommandColumn>
+        </ChildContent>
 
 
-                   
-                        <StringEnBotones TipoBoton="atras" />
-                    
-               
-                        <StringEnBotones TipoBoton="siguiente" />
-                
-                
-                        <StringEnBotones TipoBoton="primero" />
-                 
-               
-                        <StringEnBotones TipoBoton="ultimo" />
-                
-                </tbody>
-            </table>
+        <PreviousPageButtonTemplate>
+            <StringEnBotones TipoBoton="atras" />
+        </PreviousPageButtonTemplate>
+        <NextPageButtonTemplate>
+            <StringEnBotones TipoBoton="siguiente" />
+        </NextPageButtonTemplate>
+        <FirstPageButtonTemplate>
+            <StringEnBotones TipoBoton="primero" />
+        </FirstPageButtonTemplate>
+        <LastPageButtonTemplate>
+            <StringEnBotones TipoBoton="ultimo" />
+        </LastPageButtonTemplate>
+
+
+
+    </DataGrid>
+}
+<ModalVer @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
+    <EditForm Model="@Solicitud">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha inicio: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Fecha fin: </label>
+                    <div>
+                        <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <div class="form-group">
+                    <label>Descripción: </label>
+                    <div>
+                        <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
+                               placeholder="Descripción" disabled />
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-    </div>
-}
-    <ModalVer @ref="Modal" Titulo="Cambiar estatus" onCancel="OcultarModal">
-        <EditForm Model="@Solicitud">
-            <DataAnnotationsValidator />
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha inicio: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="Solicitud.FechaInicio" placeholder="Fecha inicio" disabled />
-                        </div>
-                    </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Cantidad de dias: </label>
+                    <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
                 </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Fecha fin: </label>
-                        <div>
-                            <input class="form-control" type="date" @bind-value="Solicitud.FechaFin" placeholder="Fecha Fin" disabled />
-                        </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label>Estatus: </label>
+                    <div>
+                        <select class="form-control" @bind="Solicitud.Estatus">
+                            <option disabled>Seleccione</option>
+
+                            @foreach (var items in ListaEstados)
+                            {
+                                <option value="@items.Descripcion">@items.Descripcion</option>
+                            }
+                        </select>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <div class="form-group">
-                        <label>Descripción: </label>
-                        <div>
-                            <input class="form-control" type="text" @bind-value="Solicitud.Descripcion"
-                                   placeholder="Descripción" disabled />
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Cantidad de dias: </label>
-                        <input class="form-control" type="text" @bind-value="Solicitud.CantidadDias" disabled />
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label>Estatus: </label>
-                        <div>
-                            <select class="form-control" @bind="Solicitud.Estatus">
-                                <option disabled>Seleccione</option>
-
-                                @foreach (var items in ListaEstados)
-                                {
-                                    <option value="@items.Descripcion">@items.Descripcion</option>
-                                }
-                            </select>
-                            @*              <input class="form-control" type="text" @bind-value="Solicitud.Estatus" disabled />*@
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
 
 
-            <div class="mb-2 pb-2">
-                <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonAprobar</button>
-                <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
-            </div>
+        <div class="mb-2 pb-2">
+            <button class="btn btn-success" @onclick="(() => Acciones())">@ButtonGuardar</button>
+            <button class="btn btn-info" @onclick="(() => OcultarModal())">@ButtonCancelar</button>
+        </div>
 
-        </EditForm>
-    </ModalVer>
+    </EditForm>
+</ModalVer>
 
-    <AuthorizeView>
-        <Authorized>
-            <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
-            @if (context.User.Identity.Name != null)
-            {
-                EmailUsuario = @context.User.Identity.Name;
-                IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
-                NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
-                //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
+<AuthorizeView>
+    <Authorized>
+        <a hidden href="authentication/profile">Hola, @context.User.Identity.Name</a>
+        @if (context.User.Identity.Name != null)
+        {
+            EmailUsuario = @context.User.Identity.Name;
+            IdCreador = @context.User.Claims.First(c => c.Type == "sub").Value;
+            NombreUsuario = @context.User.Claims.First(c => c.Type == "FullNameUser").Value;
+            //   RolUsuario = @context.User.Claims.First(c => c.Type == "role").Value;
 
-            }
+        }
 
-        </Authorized>
-    </AuthorizeView>
+    </Authorized>
+</AuthorizeView>
 
 
-    @code {
+@code {
 
-        ModalVer Modal;
-        bool editar = false;
-        bool Ver = false;
-public Solicitud Solicitud { get; set; } = new Solicitud();
-    public List<Solicitud> ListaSolicitudes { get; set; }
+    ModalVer Modal;
+    bool editar = false;
+    bool Ver = false;
+    public Solicitud Solicitud { get; set; } = new Solicitud();
+    public List<Solicitud> ListaSolicitudes { get; set; } = new List<Solicitud>();
+    public List<Solicitud> ListaSolicitudesObtener { get; set; }
     public List<Empleado> ListaEmpleado { get; set; } = new List<Empleado>();
     public Empleado Empleado { get; set; } = new Empleado();
     string EmailUsuario;
@@ -186,7 +230,8 @@ public Solicitud Solicitud { get; set; } = new Solicitud();
     string NombreMostrar;
     string ButtonGuardar = "Guardar";
     string ButtonCancelar = "Cancelar";
-    string ButtonAprobar = "Aprobar";
+    private string dateInputValue;
+    string customFilterValue;
     public class Estado
     {
         public string Id { get; set; }
@@ -199,6 +244,7 @@ public Solicitud Solicitud { get; set; } = new Solicitud();
 
         try
         {
+            dateInputValue = DateTime.Now.ToString("dd/MM/yyyy");
 
             ListaEstados = new List<Estado>()
 {
@@ -207,7 +253,15 @@ public Solicitud Solicitud { get; set; } = new Solicitud();
                 new Estado {Id="gen123",Descripcion= "Desaprobada"},
             };
 
-            ListaSolicitudes = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/generadas");
+            ListaSolicitudes = new List<Solicitud>();
+            ListaSolicitudesObtener = await http.GetFromJsonAsync<List<Solicitud>>($"api/solicitud/generadas");
+            ListaSolicitudesObtener.ForEach(items =>
+            {
+                items.EmpleadoNombre = items.Empleado.Nombre;
+                items.EmpleadoApellido = items.Empleado.Apellido;
+                items.EmpleadoCedula = items.Empleado.Cedula;
+                ListaSolicitudes.Add(items);
+            });
 
 
         }
@@ -243,36 +297,43 @@ public Solicitud Solicitud { get; set; } = new Solicitud();
     async Task Acciones()
     {
 
-
-
-
-
-
         var repuesta = await http.PutAsJsonAsync("api/solicitud", Solicitud);
         string configuracion = repuesta.StatusCode.ToString();
         if (configuracion.Equals("OK"))
         {
             toast.ShowSuccess("Se actualizo correctamente", "Exito");
             Modal.Ocultar();
-
+            await OnInitializedAsync();
 
         }
         else
         {
-            toast.ShowError("Error del sistema", "Exito");
+            toast.ShowError("Error del sistema", "Error");
         }
-
-
-
-
+        await OnInitializedAsync();
 
     }
 
-    void OcultarModal()
+    async Task OcultarModal()
     {
         Modal.Ocultar();
+        await OnInitializedAsync();
+    }
+
+    bool OnCustomFilter(Solicitud model)
+    {
+        if (string.IsNullOrEmpty(customFilterValue))
+            return true;
+
+        return
+            model.Estatus?.Contains(customFilterValue, StringComparison.OrdinalIgnoreCase) == true
+            || model.Empleado.Nombre?.Contains(customFilterValue, StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    void OnSelectedRowStyling(Solicitud solicitud, DataGridRowStyling styling)
+    {
+        styling.Background = Background.Info;
     }
 
 
-
-    }
+}

@@ -12,7 +12,7 @@
                 <body>
                     <div align="center">
        
-                        <h2>No esta autorizado</h2>
+                        <h2>No esta autorizado <span><img src="/Imagenes/advertencia.png"  width="512" height="512"/></span></h2>
 
                         <div class="media-content">
                             @* <img src="~/Imagenes/Error.png"/>*@
@@ -27,8 +27,19 @@
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p>Lo sentimos, no hay nada en esta dirección.</p>
-</LayoutView>
+                <body>
+                    <div align="center">
+
+                        <h2>No encontrado <span><img src="/Imagenes/advertencia.png" width="512" height="512" /></span></h2>
+
+                        <div class="media-content">
+                            @* <img src="~/Imagenes/Error.png"/>*@
+                            <img src="/Imagenes/error-404.png" />
+                        </div>
+                    </div>
+                </body>
+ 
+            </LayoutView>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
