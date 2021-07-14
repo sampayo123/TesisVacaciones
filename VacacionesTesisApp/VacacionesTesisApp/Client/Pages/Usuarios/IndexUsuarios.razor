@@ -12,24 +12,38 @@
 
 
 
-@if(Lista==null)
+@if (Lista == null)
 {
-    <Loader/>
+    <Loader />
 }
 else if (Lista.Count == 0)
 {
-    <div class="form-row">
-        <div class="col-md-8 col-sm-6 mb-3" align="left">
-            <h3>Administrar Usuarios</h3>
-            <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+    @*   <div class="form-row">
+            <div class="col-md-8 col-sm-6 mb-3" align="left">
+                <h3>Administrar Usuarios</h3>
+                <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+            </div>
+            <div class="col-md-4 col-sm-6 mb-3" align="right">
+                <h5>
+                    <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
+                </h5>
+            </div>
+        </div>*@
+
+    <nav class="navbar navbar-light bg-light">
+        <div class="col-md-6  mr-0 pl-0">
+            <h5>
+                <span class="oi oi-person" aria-hidden="true"></span>
+                &nbsp;Administrar Usuarios
+            </h5>
         </div>
-        <div class="col-md-4 col-sm-6 mb-3" align="right">
+        <div class="col-md-6" align="right">
             <h5>
                 <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
             </h5>
         </div>
-    </div>
 
+    </nav>
     <hr />
 
     <div class="form-row">
@@ -42,17 +56,20 @@ else if (Lista.Count == 0)
     <text>No hay registros.</text> }
 else
 {
-    <div class="form-row">
-        <div class="col-md-8 col-sm-6 mb-3" align="left">
-            <h3>Administrar Usuarios</h3>
-            <small style="text-decoration-color:dimgrey"> &nbsp;Lista de usuarios</small>
+    <nav class="navbar navbar-light bg-light">
+        <div class="col-md-6  mr-0 pl-0">
+            <h5>
+                <span class="oi oi-person" aria-hidden="true"></span>
+                &nbsp;Administrar Usuarios
+            </h5>
         </div>
-        <div class="col-md-4 col-sm-6 mb-3" align="right">
+        <div class="col-md-6" align="right">
             <h5>
                 <span aria-hidden="true"></span> &nbsp;Fecha: @dateInputValue
             </h5>
         </div>
-    </div>
+
+    </nav>
 
     <hr />
 
